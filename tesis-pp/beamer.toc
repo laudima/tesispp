@@ -1,6 +1,0 @@
-\beamer@sectionintoc {1}{Introducción}{3}{0}{1}
-\beamer@subsectionintoc {1}{1}{Pregunta Central}{4}{0}{1}
-\beamer@subsectionintoc {1}{2}{Motivaciones Epistémicas}{5}{0}{1}
-\beamer@subsectionintoc {1}{3}{Antecedentes}{8}{0}{1}
-\beamer@subsectionintoc {1}{4}{Ejemplos en la Ciencia}{15}{0}{1}
-\beamer@subsectionintoc {1}{5}{Diferentes Arquitecturas}{17}{0}{1}
