@@ -1,0 +1,40 @@
+%--------------------------------------
+% ICPHILCOMP 25 LaTeX Beamer template
+% Based on CleanEasy by Jose Paulo Marchezi
+% https://github.com/zemarchezi/CleanEasy_BeamerTheme
+% This template is distributed under the CC BY-NC 4.0 License:
+% https://creativecommons.org/licenses/by-nc/4.0/
+%
+% ICPHILCOMP, Philosophy of Computing and Filosofía de la Computación
+% logos and trademarks property of the Philosophy of Computing Research Group. 
+% Agile Design Studio is an AgileEngine trademark.
+%--------------------------------------
+
+% Make sure to use the T1 font encoding for proper output
+\RequirePackage[T1]{fontenc}
+% Load the montserrat package
+\RequirePackage{montserrat}
+\usepackage[utf8]{inputenc}
+\usepackage{montserrat}
+\usepackage[T1]{fontenc}
+
+% Set the default font family to the sans-serif family
+\renewcommand{\familydefault}{\sfdefault}
+
+% Set the base font for beamer's structural elements to the sans-serif family
+\setbeamerfont{structure}{family=\sffamily,series=\mdseries}
+
+% Customizing typsestting parts
+\setbeamerfont{title}{size=\Large,series=\bfseries,parent=structure}
+\setbeamerfont{subtitle}{size=\normalsize,parent=title}
+\setbeamerfont{date}{size=\scriptsize,series=\mdseries,parent=structure}
+\setbeamerfont{author}{size=\normalsize,series=\bfseries,parent=structure}
+\setbeamerfont{institute}{size=\scriptsize,series=\mdseries,parent=structure}
+\setbeamerfont{section in toc}{size=\normalsize,series=\bfseries,parent=structure}
+\setbeamerfont{section in head/foot}{size=\tiny,parent=structure}
+\setbeamerfont{subsection in toc}{size=\small,series=\mdseries,parent={section in toc}}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries,parent=structure}
+\setbeamerfont{framesubtitle}{parent=frametitle,size=\large}
+\setbeamerfont{caption}{size=\footnotesize}
+\setbeamerfont{item}{parent=structure,series=\mdseries}
+\setbeamerfont{block title}{size=\normalsize,series=\bfseries,parent={structure,block body}}

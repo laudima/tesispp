@@ -1,0 +1,93 @@
+%--------------------------------------
+% ICPHILCOMP 25 LaTeX Beamer template
+% Based on CleanEasy by Jose Paulo Marchezi
+% https://github.com/zemarchezi/CleanEasy_BeamerTheme
+% This template is distributed under the CC BY-NC 4.0 License:
+% https://creativecommons.org/licenses/by-nc/4.0/
+%
+% ICPHILCOMP, Philosophy of Computing and Filosofía de la Computación
+% logos and trademarks property of the Philosophy of Computing Research Group. 
+% Agile Design Studio is an AgileEngine trademark.
+%--------------------------------------
+
+% Frame numbering
+\setbeamertemplate{page number in head/foot}[totalframenumber]
+
+% Navigation symbols (disabled)
+\setbeamertemplate{navigation symbols}{}
+
+% Standard footline
+\defbeamertemplate*{footline}{ICPHILCOMP25 theme}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.2\paperwidth,ht=2.25ex,dp=1ex,left]{author in head/foot}%
+      \usebeamerfont{author in head/foot}\hspace*{3ex}\textcolor{fg!50}{\insertshortauthor} \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.63\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+      \usebeamerfont{title in head/foot}\textcolor{fg!50}{\insertshorttitle}
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.15\paperwidth,ht=2ex,dp=1ex,right]{date in head/foot}%
+      \usebeamerfont{date in head/foot}\textcolor{fg!50}{\insertshortdate{}\hspace*{1ex} \insertframenumber{}/\inserttotalframenumber}\hspace*{2ex}
+    \end{beamercolorbox}}%
+  \vskip1pt%
+}
+
+% Empty footline for title and plain pages
+\defbeamertemplate{footline}{empty}{}
+
+% Section page
+\defbeamertemplate*{section page}{ICPHILCOMP25 theme}{%
+  \begin{centering}
+    \begin{beamercolorbox}[sep=12pt,center]{part title}
+      \usebeamerfont{section title}\insertsection\par
+    \end{beamercolorbox}
+  \end{centering}
+}
+
+% Sidebar navigation (disabled by default)
+\setbeamertemplate{sidebar left}{}
+\setbeamertemplate{sidebar right}{}
+
+% Background
+\setbeamertemplate{background canvas}{
+    \includegraphics[width=\paperwidth,height=\paperheight]{assets/slide.png}
+}
+
+% Special handling for title page
+\AtBeginDocument{%
+  \setbeamertemplate{footline}[ICPHILCOMP25 theme]
+  % Use empty footline for title page and TOC
+  \BeforeBeginEnvironment{frame}{%
+    \setbeamertemplate{footline}[ICPHILCOMP25 theme]%
+  }
+  \apptocmd{\maketitle}{%
+    \setbeamertemplate{footline}[empty]%
+  }{}{}
+  \apptocmd{\tableofcontents}{%
+    \setbeamertemplate{footline}[empty]%
+  }{}{}
+}
+
+% Section beggining
+\AtBeginSection[]
+{
+  \begin{frame}[plain]
+    \begin{tikzpicture}[remember picture,overlay]
+    \node at (current page.center){
+        \includegraphics[width=\paperwidth,height=\paperheight,keepaspectratio]{assets/slide_negative_no_mark.png}
+    };
+        
+    \node[
+        anchor=west, 
+        text width=0.6\paperwidth, 
+        align=left, 
+        font=\Large\bfseries
+      ] at ([xshift=-2cm]current page.center) {
+        \textcolor{White}
+        \insertsectionhead
+    };
+
+      \draw[thick, Morado!40] 
+        ([xshift=-2cm, yshift=-1cm]current page.center) -- ++(\paperwidth/2,0);
+    \end{tikzpicture}
+  \end{frame}
+}

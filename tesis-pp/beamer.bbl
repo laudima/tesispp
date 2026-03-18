@@ -1,0 +1,99 @@
+\begin{thebibliography}{10}
+
+\bibitem{hey2009fourth}
+Anthony~JG Hey, Stewart Tansley, Kristin~Michele Tolle, et~al.
+\newblock {\em The fourth paradigm: data-intensive scientific discovery}, volume~1.
+\newblock Microsoft research Redmond, WA, 2009.
+
+\bibitem{wang2023scientific}
+Hanchen Wang, Tianfan Fu, Yuanqi Du, Wenhao Gao, Kexin Huang, Ziming Liu, Payal Chandak, Shengchao Liu, Peter Van~Katwyk, Andreea Deac, et~al.
+\newblock Scientific discovery in the age of artificial intelligence.
+\newblock {\em Nature}, 620(7972):47--60, 2023.
+
+\bibitem{ioannidis20245th}
+Yannis Ioannidis.
+\newblock The 5th paradigm: Ai-driven scientific discovery.
+\newblock {\em Communications of the ACM}, 67(12):5--5, 2024.
+
+\bibitem{bianchini2020deep}
+Stefano Bianchini, Moritz M{\"u}ller, and Pierre Pelletier.
+\newblock Deep learning in science.
+\newblock {\em arXiv preprint arXiv:2009.01575}, 2020.
+
+\bibitem{rosen2012anticipatory}
+Robert~Rosen (auth.).
+\newblock {\em Anticipatory Systems: Philosophical, Mathematical, and Methodological Foundations}.
+\newblock IFSR International Series in Systems Science and Systems Engineering №1. Springer, 2 edition, 2012.
+
+\bibitem{doshi2017towards}
+Finale Doshi-Velez and Been Kim.
+\newblock Towards a rigorous science of interpretable machine learning.
+\newblock {\em arXiv preprint arXiv:1702.08608}, 2017.
+
+\bibitem{soto-astorga2025codificaciones}
+Enrique~F. Soto-Astorga.
+\newblock Codificaciones y la relación de modelado, 2025.
+\newblock Obsidian Publish.
+
+\bibitem{lagemann2023deep}
+Kai Lagemann, Christian Lagemann, Bernd Taschler, and Sach Mukherjee.
+\newblock Deep learning of causal structures in high dimensions under data limitations.
+\newblock {\em Nature Machine Intelligence}, 5(11):1306--1316, 2023.
+
+\bibitem{pearl2000causality}
+Judea Pearl.
+\newblock {\em Causality: Models, Reasoning, and Inference}.
+\newblock Cambridge University Press, 2000.
+
+\bibitem{pearl2018bookOfWhy}
+Judea Pearl and Dana Mackenzie.
+\newblock {\em The book of why: the new science of cause and effect}.
+\newblock Basic books, 2018.
+
+\bibitem{pearl2018theoretical}
+Judea Pearl.
+\newblock Theoretical impediments to machine learning with seven sparks from the causal revolution.
+\newblock {\em arXiv preprint arXiv:1801.04016}, 2018.
+
+\bibitem{scholkopf2021toward}
+Bernhard Sch{\"o}lkopf, Francesco Locatello, Stefan Bauer, Nan~Rosemary Ke, Nal Kalchbrenner, Anirudh Goyal, and Yoshua Bengio.
+\newblock Toward causal representation learning.
+\newblock {\em Proceedings of the IEEE}, 109(5):612--634, 2021.
+
+\bibitem{papamarkou2024position}
+Theodore Papamarkou, Tolga Birdal, Michael Bronstein, Gunnar Carlsson, Justin Curry, Yue Gao, Mustafa Hajij, Roland Kwitt, Pietro Lio, Paolo Di~Lorenzo, et~al.
+\newblock Position: Topological deep learning is the new frontier for relational learning.
+\newblock {\em Proceedings of machine learning research}, 235:39529, 2024.
+
+\bibitem{yang2025trans}
+Hai Yang, Zhenbei Yang, Lei Zhang, Yijing Yang, Dan Zhou, Dongdong Li, Jing Zhang, and Zhe Wang.
+\newblock Trans-driver: a deep learning approach for cancer driver gene discovery with multi-omics data.
+\newblock {\em IEEE Transactions on Computational Biology and Bioinformatics}, 2025.
+
+\bibitem{chatzianastasis2023explainable}
+Michail Chatzianastasis, Michalis Vazirgiannis, and Zijun Zhang.
+\newblock Explainable multilayer graph neural network for cancer gene prediction.
+\newblock {\em Bioinformatics}, 39(11):btad643, 2023.
+
+\bibitem{zhang2022dgmp}
+Shao-Wu Zhang, Jing-Yu Xu, and Tong Zhang.
+\newblock Dgmp: identifying cancer driver genes by jointing dgcn and mlp from multi-omics genomic data.
+\newblock {\em Genomics, Proteomics \& Bioinformatics}, 20(5):928--938, 2022.
+
+\bibitem{dessi2022scicero}
+Danilo Dess{\'\i}, Francesco Osborne, Diego~Reforgiato Recupero, Davide Buscaldi, and Enrico Motta.
+\newblock Scicero: A deep learning and nlp approach for generating scientific knowledge graphs in the computer science domain.
+\newblock {\em Knowledge-Based Systems}, 258:109945, 2022.
+
+\bibitem{oguntola2026unmasking}
+Adewale~U. Oguntola, Adesola~G. Adedayo, Olowookere~A. AbdulQoyum, Adesope~A. Adetoro, Adebukola~M. Madehin, and Ummulkhoyr~A. Shittu.
+\newblock {\em Unmasking Hidden Fraud Patterns: An Explainable Graph Attention Network Approach for Highly Imbalanced Financial Datasets}.
+\newblock PhD thesis, Abiola Ajimobi Technical University, Ibadan, Oyo State, Nigeria, Department of Computer Science, Abiola Ajimobi Technical University, Ibadan, Oyo State, Nigeria, 2026.
+\newblock Corresponding Author: Adewale U. Oguntola, Phone: +234 703 108 1926. Other authors: gabrieladesola5@gmail.com, abdulqoyumadegoke@gmail.com, adesopeaisha52@gmail.com, madehinadebukolamordiyah@gmail.com, Adebukolashittu20@gmail.com.
+
+\bibitem{modell2025origins}
+Alexander Modell, Patrick Rubin-Delanchy, and Nick Whiteley.
+\newblock The origins of representation manifolds in large language models.
+\newblock {\em arXiv preprint arXiv:2505.18235}, 2025.
+
+\end{thebibliography}

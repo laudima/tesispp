@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: beamer.aux
+The style file: unsrt.bst
+Database file #1: reference.bib
+Warning--entry type for "soto-astorga2025codificaciones" isn't style-file defined
+--line 210 of file reference.bib
+You've used 19 entries,
+            1791 wiz_defined-function locations,
+            560 strings with 7767 characters,
+and the built_in function-call counts, 4029 in all, are:
+= -- 314
+> -- 264
+< -- 1
++ -- 96
+- -- 77
+* -- 286
+:= -- 711
+add.period$ -- 59
+call.type$ -- 19
+change.case$ -- 15
+chr.to.int$ -- 0
+cite$ -- 19
+duplicate$ -- 164
+empty$ -- 359
+format.name$ -- 77
+if$ -- 853
+int.to.chr$ -- 0
+int.to.str$ -- 19
+missing$ -- 21
+newline$ -- 99
+num.names$ -- 19
+pop$ -- 54
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 54
+stack$ -- 0
+substring$ -- 167
+swap$ -- 20
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 32
+width$ -- 21
+write$ -- 207
+(There was 1 warning)
