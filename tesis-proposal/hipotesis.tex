@@ -42,3 +42,36 @@ LLM dispone de una distribución de probabilidad sobre tokens optimizada
 para predecir texto humano.
 
 \section{Resumen Hipotesis}
+
+\section{Plan de Trabajo}
+
+El trabajo se organiza en cuatro etapas.
+
+\textbf{Etapa 1. Definiciones y marco teórico}. 
+La primera etapa comprende la lectura de las 
+fuentes primarias , así como la redacción completa del 
+capítulo de marco teórico. Las cinco secciones del marco: causalidad, jerarquía de causalidad, modelo causal de Pearl, relación de modelado de Rosen ( demasiado ? ), bloque integrador. 
+
+\textbf{Etapa 2. Mapeo de patrones de fallo causal}. Se diseña un sistema de evaluación en Python que descarga el benchmark CLadder, selecciona un subconjunto representativo de preguntas por 
+nivel causal, consulta uno o dos LLMs mediante API, y registra para cada pregunta la respuesta del modelo, la respuesta 
+correcta, el nivel causal (L1, L2, L3), el subtipo de consulta dentro 
+del nivel, por ejemplo, correlación directa en L1, intervención con 
+variable mediadora en L2, o contrafactual con confounder en L3, y la 
+topología del grafo causal subyacente a la pregunta, que en CLadder 
+puede ser una cadena, una bifurcación, un colisionador o una estructura 
+de mediación. Sobre estos resultados 
+se construye el DAG de patrones de fallo utilizando \texttt{networkx}, donde 
+cada nodo representa un tipo de razonamiento causal y su color refleja la 
+tasa de error del modelo en ese tipo de pregunta. La implementación se 
+expondrá en un repositorio publico en \textit{Github} y se documentara para garantizar su reproducibilidad. El DAG de patrones de fallo es una herramienta de visualización que permite leer dónde es que la jerarquía causal colapsa el razonamiento de los LLMs, y con qué topología de grafo se asocia cada tipo de fallo. 
+
+\textbf{Etapa 3. Análisis e interpretación.}
+La tercera etapa produce el capítulo de discusión. El argumento se construye 
+en dos secciones: primero, mostrar que los patrones de error observados en 
+el DAG son estructuralmente consistentes con la hipótesis de simulación 
+predictiva, mostrando que los errores se concentran en L2 y L3, exactamente donde el 
+marco teórico predice que los LLMs fallarán.  
+Segundo, rebatir contraargumentos, por ejemplo
+\textcite{butkus2025causal}  muestran un modelo rn entrenado bajo datos sintéticos y limitados. 
+
+\textbf{Etapa 4. Redacción final}. Integración de capítulos, correciones, alineación de formato, anexos. 

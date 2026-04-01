@@ -11,6 +11,7 @@
 \usepackage{caption}
 \usepackage[nocheck]{fancyhdr}
 \usepackage{listings}
+\usepackage{hyperref}
 \usepackage[
   backend=biber,
   style=apa,
@@ -31,8 +32,8 @@
 \doublespacing        % <-- activa doble interlineado
 \setlength{\RaggedRightParindent}{\parindent}
 
-\pagecolor{black} % DarkMode
-\color{white}     % DarkMode
+% \pagecolor{black} % DarkMode
+% \color{white}     % DarkMode
 
 \thispagestyle{fancy}
 \rhead{\includegraphics[scale=0.07]{images/Logo_FC.png}}
@@ -62,8 +63,8 @@ representación mecanística que exige una relación de modelado legítima.
 \subsection{Objetivo Secundario}
 
 Validar empíricamente el marco teórico mediante el análisis de los patrones de fallo 
-de los LLMs en el benchmark CLadder \cite{jin2023cladder}. Construyendo un DAG con 
-\textit{networkx} que evidencie que dichos fallos no son aleatorios sino estructuralmente 
+de los LLMs en el benchmark CLadder \parencite{jin2023cladder}. Construyendo un DAG con 
+\href{https://networkx.org/}{networkx} que evidencie que dichos fallos no son aleatorios sino estructuralmente 
 concentrados en los niveles de intervención y contrafactuales, consistentemente con la ausencia de representación 
 mecanística predicha por el marco teórico.
 
@@ -121,51 +122,59 @@ consistentes con la hipótesis principal: los LLMs se concentran
 sistemáticamente en el nivel de asociación (L1) de la jerarquía de Pearl y exhiben 
 un fallo en las relaciones de intervención (L2) y contrafactual (L3). 
 
-\section{Plan de Trabajo}
-
-El trabajo se organiza en cuatro etapas.
-
-\textbf{Etapa 1. Definiciones y marco teórico}. 
-La primera etapa comprende la lectura de las 
-fuentes primarias , así como la redacción completa del 
-capítulo de marco teórico. Las cinco secciones del marco: causalidad, jerarquía de causalidad, modelo causal de Pearl, relación de modelado de Rosen ( demasiado ? ), bloque integrador. 
-
-\textbf{Etapa 2. Mapeo de patrones de fallo causal}. Se diseña un sistema de evaluación en Python que descarga el benchmark CLadder, selecciona un subconjunto representativo de preguntas por 
-nivel causal, consulta uno o dos LLMs mediante API, y registra para cada pregunta la respuesta del modelo, la respuesta 
-correcta, el nivel causal (L1, L2, L3), el subtipo de consulta dentro 
-del nivel, por ejemplo, correlación directa en L1, intervención con 
-variable mediadora en L2, o contrafactual con confounder en L3, y la 
-topología del grafo causal subyacente a la pregunta, que en CLadder 
-puede ser una cadena, una bifurcación, un colisionador o una estructura 
-de mediación. Sobre estos resultados 
-se construye el DAG de patrones de fallo utilizando \texttt{networkx}, donde 
-cada nodo representa un tipo de razonamiento causal y su color refleja la 
-tasa de error del modelo en ese tipo de pregunta. La implementación se 
-expondrá en un repositorio publico en \textit{Github} y se documentara para garantizar su reproducibilidad. El DAG de patrones de fallo es una herramienta de visualización que permite leer dónde es que la jerarquía causal colapsa el razonamiento de los LLMs, y con qué topología de grafo se asocia cada tipo de fallo. 
-
-\textbf{Etapa 3. Análisis e interpretación.}
-La tercera etapa produce el capítulo de discusión. El argumento se construye 
-en dos secciones: primero, mostrar que los patrones de error observados en 
-el DAG son estructuralmente consistentes con la hipótesis de simulación 
-predictiva, mostrando que los errores se concentran en L2 y L3, exactamente donde el 
-marco teórico predice que los LLMs fallarán.  
-Segundo, rebatir contraargumentos, por ejemplo
-\textcite{butkus2025causal}  muestran un modelo rn entrenado bajo datos sintéticos y limitados. 
-
-\textbf{Etapa 4. Redacción final}. Integración de capítulos, correciones, alineación de formato, anexos. 
-
 
 \section{Índice tentativo}
 \begin{enumerate}
   \item Introducción
   \begin{enumerate}
     \item Contexto histórico y científico del trabajo
-    \item  Objetivos
+    \item Objetivos y preguntas de investigación
     \item Hipótesis
-    \item Visión general del trabajo
+    \item Estructura de la tesis
+  \end{enumerate}
+  \item Marco teórico
+  \begin{enumerate}
+    \item Definición de causalidad
+    \item La jerarquía causal de Pearl
+    \item Modelo causal estructural y funciones mecanísticas
+    \item Relación de modelado de Rosen
+    \item Principio de mecanismos causales independientes (ICM)
+    \item Integración teórica y criterio para inferencia causal vs simulación predictiva
+  \end{enumerate}
+  \item Metodología
+  \begin{enumerate}
+    \item Benchmark CLadder y categorización de preguntas
+    \item Selección de subconjunto representativo por nivel causal
+    \item Diseño del sistema de evaluación en Python
+    \item Consulta a LLMs mediante API
+    \item Registro de respuestas, niveles causales y topologías del grafo
+    \item Construcción del DAG de patrones de fallo con \texttt{networkx}
+  \end{enumerate}
+  \item Resultados
+  \begin{enumerate}
+    \item Resultados cuantitativos por nivel causal (L1, L2, L3)
+    \item Patrones de fallo según subtipo y topología del grafo causal
+    \item Visualización y análisis del DAG de patrones de fallo
+  \end{enumerate}
+  \item Discusión e interpretación
+  \begin{enumerate}
+    \item Consistencia estructural con la hipótesis de simulación predictiva
+    \item Limitaciones y posibles contraargumentos
+    \item Comparación con trabajos previos y argumentos contrarios
+  \end{enumerate}
+  \item Conclusiones y trabajo futuro
+  \begin{enumerate}
+    \item Contribuciones principales
+    \item Implicaciones para el análisis causal de LLMs
+    \item Recomendaciones para investigación futura
+  \end{enumerate}
+  \item Anexos
+  \begin{enumerate}
+    \item Detalles de implementación y código fuente
+    \item Documentación del repositorio público en GitHub
+    \item Material suplementario y tablas adicionales
   \end{enumerate}
 \end{enumerate}
-
 
 \printbibliography
 \end{document}
