@@ -1,0 +1,44 @@
+\section{Hipótesis}
+
+Los grandes modelos de lenguaje (LLMs) no satisfacen dichos criterios. 
+Lo que exhiben son \textit{inferencias inductivas} 
+\parencite{fawkes2024fragility} y se encuentran en la primera capa de 
+la jerarquía de causalidad de \textcite{pearl2018theoretical}, las 
+\textit{asociaciones}. Un LLM que produce respuestas causalmente 
+correctas sin tener acceso a los \textit{entrelazamientos} causales del sistema natural 
+está, en términos de \textcite{rosen2012anticipatory}, 
+imputando\footnote{Imputar, en el sentido de Rosen, significa atribuir 
+al mundo externo una estructura relacional construida por el sistema 
+observador (nuestra mente), tratándola como si fuera una propiedad objetiva de ese 
+mundo y no una construcción del observador.} relaciones al mundo 
+externo sin el respaldo de una relación de modelado legítima. No hay 
+un sistema natural $N$ codificado en él de manera que sus inferencias 
+se decodifiquen como predicciones verificables sobre ese $N$ 
+específico. 
+
+Esta distinción adquiere precisión formal a través de la noción de 
+modelo causal de \textcite{pearl2000causality}. Para Pearl, un modelo 
+causal no es simplemente una distribución de probabilidad sobre 
+\textit{observables}, más bien es una representación explícita de los \textit{mecanismos} 
+que se alteran cuando el mundo cambia. En sus propias palabras, los 
+modelos causales \textcite[p.~203]{pearl2000causality} ``encode and distinguish information about external changes through an explicit representation of the mechanisms that are 
+altered in such changes''. Esto es precisamente lo que Rosen exige de 
+una relación de modelado legítima: que las inferencias del sistema 
+formal correspondan a relaciones estructurales del sistema natural, no 
+solo a regularidades observadas bajo condiciones estáticas.
+
+Los LLMs no tienen acceso a esa representación mecanística. Operan 
+sobre una distribución observacional comprimida en texto, sin la estructura que permitiría 
+responder a preguntas sobre \textit{intervenciones} o \textit{contrafactuales}. Más aún, como señalan 
+\textcite{scholkopf2021toward}, un modelo con comprensión estructural 
+genuina requiere que sus mecanismos internos sean independientes entre 
+sí, el principio de mecanismos causales independientes (ICM). Un LLM 
+opera sobre una mezcla entrelazada (\textit{entangled}) de todos los 
+patrones extraídos del corpus, no sobre la factorización causal 
+(\textit{disentangled}) que el ICM requiere. La diferencia no es de grado sino de 
+arquitectura; un científico que imputa una relación causal dispone de 
+un modelo formal cuyos mecanismos son separables e intervenibles; un 
+LLM dispone de una distribución de probabilidad sobre tokens optimizada 
+para predecir texto humano.
+
+\section{Resumen Hipotesis}

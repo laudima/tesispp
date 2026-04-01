@@ -1,0 +1,171 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{ dsfont }
+\usepackage{adjustbox}
+\usepackage[shortlabels]{enumitem}
+\usepackage[margin=1in]{geometry}
+\usepackage{caption}
+\usepackage[nocheck]{fancyhdr}
+\usepackage{listings}
+\usepackage[
+  backend=biber,
+  style=apa,
+  sortcites=true,
+  sorting=nyt,     % orden: autor, año, título
+  maxcitenames=2,  % "Autor & Autor (Año)" y luego "Autor et al."
+  mincitenames=1,
+  maxbibnames=99,
+  minbibnames=1,
+  maxsortnames=99,
+  minsortnames=1,
+  giveninits=true, % iniciales en nombres
+  url=true, doi=true, isbn=false, eprint=false
+]{biblatex}
+
+\usepackage{ragged2e}
+\usepackage{setspace} % <-- importante
+\doublespacing        % <-- activa doble interlineado
+\setlength{\RaggedRightParindent}{\parindent}
+
+\pagecolor{black} % DarkMode
+\color{white}     % DarkMode
+
+\thispagestyle{fancy}
+\rhead{\includegraphics[scale=0.07]{images/Logo_FC.png}}
+\lhead{\includegraphics[scale=0.065]{images/Logo_UNAM.png}}
+\chead{\large\textbf{Universidad Nacional Autónoma de México} \\
+\textbf{Facultad de Ciencias}\\
+\textsc{Anexo para titulación por tesis} \\
+\textbf{Alumno}: Rodríguez Dimayuga Laura Itzel \\
+\textbf{Asesor}: M. en Fil. C. Enrique Francisco Soto Astorga }
+\renewcommand{\headrulewidth}{1pt}
+\pagenumbering{gobble}
+\AtBeginDocument{\vspace*{2\baselineskip}}
+
+\addbibresource{references.bib}
+\begin{document}
+\section{Título tentativo}
+Visualización de patrones de fallo del aprendizaje de relaciones causales en grandes 
+modelos de lenguaje.
+
+\section{Objetivo}
+
+Establecer un marco teórico que integra la noción de causalidad de Rosen, 
+la jerarquía causal de Pearl y el principio ICM de Schölkopf, para demostrar 
+que los LLMs operan exclusivamente en el nivel asociativo y carecen de la 
+representación mecanística que exige una relación de modelado legítima.
+
+\subsection{Objetivo Secundario}
+
+Validar empíricamente el marco teórico mediante el análisis de los patrones de fallo 
+de los LLMs en el benchmark CLadder \cite{jin2023cladder}. Construyendo un DAG con 
+\textit{networkx} que evidencie que dichos fallos no son aleatorios sino estructuralmente 
+concentrados en los niveles de intervención y contrafactuales, consistentemente con la ausencia de representación 
+mecanística predicha por el marco teórico.
+
+\section{Hipótesis}
+
+La hipótesis central sostiene que los grandes modelos de lenguaje (LLMs) no 
+son capaces de realizar inferencia causal genuina, sino que operan exclusivamente 
+en el nivel de las asociaciones estadísticas, el primer escalón de la jerarquía causal de Pearl.
+
+\section{Pregunta Central}
+
+¿Satisfacen los grandes modelos de lenguaje los criterios requeridos para generar modelos 
+causales, o producen únicamente asociaciones estadísticas?
+
+\section{Justificación}
+
+\section{Resumen}
+
+Esta tesis examina si los grandes modelos de lenguaje (LLMs) satisfacen 
+los criterios requeridos para la inferencia causal, o si únicamente producen asociaciones estadísticas. 
+La hipótesis es que los LLMs no satisfacen los criterios requeridos para la inferencia causal. 
+Debido a que operan sobre una distribución observacional comprimida en \textit{tokens} que les 
+permite producir respuestas casualmente plausibles en el nivel de 
+asociación (L1), pero carecen de la representación mecanística que 
+exigen los niveles de intervención (L2) y contrafactual (L3) de la 
+jerarquía de \textcite{pearl2009causality}. El trabajo integra dos componentes.
+
+El \textbf{primero} es un marco teórico que articula, a partir de la relación de 
+modelado de \textcite{rosen2012anticipatory}, el modelo causal de 
+\textcite{pearl2000causality} y el principio de mecanismos causales 
+independientes de \textcite{scholkopf2021toward}, un criterio formal para 
+distinguir inferencia causal de simulación predictiva. El argumento 
+central es que la distinción no se resuelve con una optimización sino que viene 
+desde la arquitectura; un sistema con comprensión estructural dispone de una representación  
+\textit{mecanística}, la capacidad de un sistema de representar internamente 
+las funciones estructurales que determinan el valor de cada variable 
+a partir de sus causas,  $X_i := f_i(\text{PA}_i, U_i)$ que componen el modelo causal estructural (SCM) \parencite{pearl2000causality}. 
+En cambio, un LLM dispone de una distribución de probabilidad sobre tokens optimizada para predecir texto 
+humano.
+
+El \textbf{segundo} es un componente computacional que implementa un programa de 
+evaluación sobre el benchmark CLadder \parencite{jin2023cladder}, diseñado 
+explícitamente sobre la jerarquía causal de \textcite{pearl2009causality} 
+para evaluar los tres niveles de razonamiento causal en modelos de lenguaje: asociación (L1), 
+intervención (L2) y contrafactual (L3). El programa consulta LLMs mediante 
+API, clasifica sus respuestas según el nivel causal requerido, y construye 
+un grafo acíclico dirigido (DAG) de patrones de fallo que visualiza en qué 
+niveles de la jerarquía causal fallan.  
+La implementación utiliza \texttt{networkx} para la construcción del grafo 
+y la API de un LLM  para las consultas. 
+
+Los resultados empíricos se interpretaran con apoyo del marco teórico para 
+argumentar que los fallos observados no son aleatorios sino estructuralmente 
+consistentes con la hipótesis principal: los LLMs se concentran 
+sistemáticamente en el nivel de asociación (L1) de la jerarquía de Pearl y exhiben 
+un fallo en las relaciones de intervención (L2) y contrafactual (L3). 
+
+\section{Plan de Trabajo}
+
+El trabajo se organiza en cuatro etapas.
+
+\textbf{Etapa 1. Definiciones y marco teórico}. 
+La primera etapa comprende la lectura de las 
+fuentes primarias , así como la redacción completa del 
+capítulo de marco teórico. Las cinco secciones del marco: causalidad, jerarquía de causalidad, modelo causal de Pearl, relación de modelado de Rosen ( demasiado ? ), bloque integrador. 
+
+\textbf{Etapa 2. Mapeo de patrones de fallo causal}. Se diseña un sistema de evaluación en Python que descarga el benchmark CLadder, selecciona un subconjunto representativo de preguntas por 
+nivel causal, consulta uno o dos LLMs mediante API, y registra para cada pregunta la respuesta del modelo, la respuesta 
+correcta, el nivel causal (L1, L2, L3), el subtipo de consulta dentro 
+del nivel, por ejemplo, correlación directa en L1, intervención con 
+variable mediadora en L2, o contrafactual con confounder en L3, y la 
+topología del grafo causal subyacente a la pregunta, que en CLadder 
+puede ser una cadena, una bifurcación, un colisionador o una estructura 
+de mediación. Sobre estos resultados 
+se construye el DAG de patrones de fallo utilizando \texttt{networkx}, donde 
+cada nodo representa un tipo de razonamiento causal y su color refleja la 
+tasa de error del modelo en ese tipo de pregunta. La implementación se 
+expondrá en un repositorio publico en \textit{Github} y se documentara para garantizar su reproducibilidad. El DAG de patrones de fallo es una herramienta de visualización que permite leer dónde es que la jerarquía causal colapsa el razonamiento de los LLMs, y con qué topología de grafo se asocia cada tipo de fallo. 
+
+\textbf{Etapa 3. Análisis e interpretación.}
+La tercera etapa produce el capítulo de discusión. El argumento se construye 
+en dos secciones: primero, mostrar que los patrones de error observados en 
+el DAG son estructuralmente consistentes con la hipótesis de simulación 
+predictiva, mostrando que los errores se concentran en L2 y L3, exactamente donde el 
+marco teórico predice que los LLMs fallarán.  
+Segundo, rebatir contraargumentos, por ejemplo
+\textcite{butkus2025causal}  muestran un modelo rn entrenado bajo datos sintéticos y limitados. 
+
+\textbf{Etapa 4. Redacción final}. Integración de capítulos, correciones, alineación de formato, anexos. 
+
+
+\section{Índice tentativo}
+\begin{enumerate}
+  \item Introducción
+  \begin{enumerate}
+    \item Contexto histórico y científico del trabajo
+    \item  Objetivos
+    \item Hipótesis
+    \item Visión general del trabajo
+  \end{enumerate}
+\end{enumerate}
+
+
+\printbibliography
+\end{document}
