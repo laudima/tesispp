@@ -50,7 +50,7 @@
 \addbibresource{references.bib}
 \begin{document}
 \section{Título tentativo}
-Visualización de patrones de fallo del aprendizaje de relaciones causales en grandes 
+Visualización de patrones de fallo de inferencias causales en grandes 
 modelos de lenguaje.
 
 \section{Objetivo}
@@ -63,8 +63,8 @@ representación mecanística que exige una relación de modelado legítima.
 \subsection{Objetivo Secundario}
 
 Validar empíricamente el marco teórico mediante el análisis de los patrones de fallo 
-de los LLMs en el benchmark CLadder \parencite{jin2023cladder}. Construyendo un DAG con 
-\href{https://networkx.org/}{networkx} que evidencie que dichos fallos no son aleatorios sino estructuralmente 
+de los LLMs en el benchmark CLadder \parencite{jin2023cladder}. Construyendo un DAG para la visualización 
+que evidencie que dichos fallos no son aleatorios sino estructuralmente 
 concentrados en los niveles de intervención y contrafactuales, consistentemente con la ausencia de representación 
 mecanística predicha por el marco teórico.
 
@@ -81,6 +81,43 @@ causales, o producen únicamente asociaciones estadísticas?
 
 \section{Justificación}
 
+Causal reasoning is believed to be one of the hallmarks of human intelligence [29, 68]. The ability to
+draw causal inferences from available information is crucial for scientific understanding and rational
+decision-making: for example, knowing whether smoking causes cancer might enable consumers
+to make a more informed decision [17, 18]; assessing the causal effect of a vaccine is essential for
+effective policy-making during a pandemic [14, 44, 72, 97]; and understanding the interplay behind
+family background, education and income helps devise effective education policies [10, 11, 30, 73].
+Our opening quote therefore mirrors the aspirations of many scientists in artificial intelligence
+and causal inference: to construct a machine capable of performing sound causal reasoning, and
+able to answer causal questions at scale and with ease. Recent advances in large language models
+(LLMs) have brought about a paradigm shift in natural language processing (NLP) and artificial
+intelligence [7, 15, 39, 56, 76, 103, inter alia]. These transformative developments raise the question
+of whether these machines are already capable of causal reasoning: Do LLMs understand causality?\textcite{jin2023cladder}
+
+
+Section: Many kinds of causality. The science of causality is the study of cause and effect relationships, and is a fundamental tool for understanding
+and reasoning about the world and how it works. Correct causal reasoning is crucial to making correct decisions,
+building robust systems, and scientific discovery itself. While advances in causal modeling have formalized core
+concepts of causality, the varying tasks and problems across domains have led different fields to use related but distinct
+conceptualizations and tools.
+Here we describe three orthogonal categories of causal approaches and tasks. The first axis (covariance- and logic-based
+causality) distinguishes methodological approaches that emphasize data analysis from those that emphasize logical
+reasoning. The second axis (type vs. token causality) 2 focuses on the setting for a causal question: Are we asking
+about causal relationships in general, such as for a population, or asking questions about specific causes for a specific
+event. The third axis, presented in Section 2.2 focus on the causal question or task itself: are we interested in inferring
+new relationships, characterizing the strength of specific known or hypothesized relationships, attributing blame or
+reward for some outcome, etc. \textcite{kiciman2023causal}
+
+Otros libros para meter de referencia sobre causalidad:
+\begin{itemize}
+  \item \cite{spirtes2000causation}
+  \item \cite{peters2017elements}
+  \item \cite{pearl2014probabilistic}
+  \item \cite{pearl2016causal}
+  \item \cite{pearl2018bookOfWhy}
+  \item \cite{pearl2009causality}
+  \item \cite{halpern2016actual}
+\end{itemize}
 \section{Resumen}
 
 Esta tesis examina si los grandes modelos de lenguaje (LLMs) satisfacen 
@@ -94,7 +131,7 @@ jerarquía de \textcite{pearl2009causality}. El trabajo integra dos componentes.
 
 El \textbf{primero} es un marco teórico que articula, a partir de la relación de 
 modelado de \textcite{rosen2012anticipatory}, el modelo causal de 
-\textcite{pearl2000causality} y el principio de mecanismos causales 
+\textcite{pearl2009causality} y el principio de mecanismos causales 
 independientes de \textcite{scholkopf2021toward}, un criterio formal para 
 distinguir inferencia causal de simulación predictiva. El argumento 
 central es que la distinción no se resuelve con una optimización sino que viene 

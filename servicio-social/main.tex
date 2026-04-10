@@ -9,8 +9,8 @@
     right=1in,
 ]{geometry}
 
-\setlength{\parindent}{0pt}     % Paragraph indentation
-\setlength{\parskip}{1em}       % Vertical space between paragraphs
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
 
 \usepackage[spanish]{babel}
 \usepackage{graphicx}
@@ -18,22 +18,26 @@
 \usepackage{fancyhdr}
 \usepackage{hyperref}
 \usepackage{setspace}
-\doublespacing
+\usepackage{enumitem}
+\onehalfspacing
 
+% --- Estilo de página ---
 \fancypagestyle{firstpage}{%
-    \fancyhf{} % Clear default headers/footers
-    \renewcommand{\headrulewidth}{0pt} % No header rule
-    \renewcommand{\footrulewidth}{1pt} % Footer rule thickness
+    \fancyhf{}
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{1pt}
 }
 \fancypagestyle{subsequentpages}{%
-    \fancyhf{} % Clear default headers/footers
-    \renewcommand{\headrulewidth}{1pt} % Header rule thickness
-    \renewcommand{\footrulewidth}{1pt} % Footer rule thickness
+    \fancyhf{}
+    \renewcommand{\headrulewidth}{1pt}
+    \renewcommand{\footrulewidth}{1pt}
 }
 \AtBeginDocument{\thispagestyle{firstpage}}
 \pagestyle{subsequentpages}
 
 \begin{document}
+
+% ---- ENCABEZADO ----
 \noindent
 \begin{minipage}[t]{0.2\textwidth}
     \vspace*{-2cm}
@@ -48,20 +52,12 @@
         Fecha:  6 de abril de 2026\\
         Alumna: Laura Itzel Rodríguez Dimayuga\\
         Cuenta: 422013628\\
-        Asesor: M. en Fil. C. Enrique Francisco Soto Astorga
+        Asesor: M. en Fil. C. Enrique Francisco Soto Astorga \\
   \end{tabular}
 \end{minipage}
-% \begin{minipage}[t]{0.2\textwidth}
-%     \vspace*{-2.5cm}
-%     \begin{singlespace}
-%     \includegraphics[scale=0.06]{images/Logo_FC.png}
-%     \end{singlespace}
-% \end{minipage}
 
-\vspace{-1em}
-
+\vspace{-0.5em}
 \rule{\linewidth}{1pt}
-
 \bigskip
 
 \noindent
@@ -71,101 +67,236 @@ Universidad Nacional Autónoma de México
 
 \bigskip
 
-Por medio del presente, yo, Laura Itzel Rodríguez Dimayuga, con número de cuenta
-422013628, alumna de la Licenciatura en Ciencias de la Computación en la Facultad de Ciencias,
-informo las actividades desarrolladas durante mi servicio social, realizado bajo la asesoría del
+Por medio del presente, yo, Laura Itzel Rodríguez Dimayuga, con número de cuenta 422013628,
+alumna de la Licenciatura en Ciencias de la Computación en la Facultad de Ciencias, informo
+las actividades desarrolladas durante mi servicio social, realizado bajo la asesoría del
 M. en Fil. C. Enrique Francisco Soto Astorga, en el programa de Apoyo a Difusión y Divulgación
 Científica, con clave SSS-2025-12/139-441, registrado ante la DGOAE, en el marco de la
-1ra Conferencia Internacional de Filosofía de la Computación 2025.
+1ra Conferencia Internacional de Filosofía de la Computación 2025, llevada a cabo del
+27 de octubre al 1 de noviembre de 2025 en la Facultad de Ciencias, UNAM.
 
-Desde el 3 de octubre me encargué de promocionar las conferencias a través de redes sociales, 
-principalmente Facebook, creando contenido visual y textual para informar sobre los eventos, 
-sus fechas, horarios y temas a tratar. Además, ayudé a mantener la página web dedicada a las 
-conferencias, donde se publicaron detalles sobre los ponentes, el programa y los materiales 
-relacionados. También colaboré en la organización logística de las conferencias, coordinando 
-con los ponentes y asegurando que todo el material necesario estuviera disponible para su 
-presentación. Para ello, ayudé a revisar las presentaciones, semblanzas y biografías de los 
-ponentes, con el fin de catalogar los diferentes bloques que constituyeron los distintos ejes 
-temáticos de la conferencia.
+% ================================================================
+\section{Actividades realizadas}
+% ================================================================
+A lo largo del servicio social participé en las distintas etapas que conformaron la organización,
+desarrollo y difusión de la 1ra Conferencia Internacional de Filosofía de la Computación 2025.
+Las actividades abarcaron desde la preparación logística y la promoción en redes sociales previas
+al evento, hasta el apoyo durante los días de la conferencia y las tareas de cierre y divulgación
+posteriores. A continuación se describen las actividades realizadas en cada una de estas etapas.
+% ----------------------------------------------------------------
+\subsection{Preparación previa a la conferencia (octubre 2025)}
+% ----------------------------------------------------------------
 
-Durante el periodo del 27 de octubre al 1 de noviembre, ayudé a registrar a los asistentes, 
-además de ser encargada de diversas salas donde presenté a los ponentes, asegurando que las 
-conferencias se desarrollaran sin contratiempos técnicos o logísticos. También, durante el 
-periodo del 2 al 6 de noviembre, me encargué de recopilar y organizar el material de las 
-conferencias para su posterior difusión, incluyendo la edición de fotos y videos para su 
-publicación en redes sociales y la página web. Posteriormente, en enero, me encargué de 
-recopilar la información sobre los asistentes y la participación de los ponentes para enviar 
-sus certificados de participación. Finalmente, durante febrero y marzo, colaboré en la 
-redacción de un ensayo divulgativo que servirá como base para videos cortos sobre los temas 
-abordados en el Seminario de Filosofía de la Computación, los cuales se publicarán en redes 
-sociales con el objetivo de acercar estos contenidos a un público más amplio.
-\bigskip
-\section*{Evidencia de actividades}
-A continuación se presentan capturas de pantalla de las publicaciones realizadas en redes sociales, así como algunos materiales relacionados con la organización y difusión de las conferencias. Estas evidencias demuestran mi participación activa en la promoción, organización y difusión de los eventos, cumpliendo con los objetivos establecidos para el servicio social.
-\begin{center}
-    \begin{minipage}{0.24\textwidth}
-        \includegraphics[width=\linewidth]{images/post1.png}
+Desde el 3 de octubre me integré al equipo organizador y contribuí en varios aspectos fundamentales
+para el éxito del evento. En primer lugar, leí notas sobre la conferencia y las lecciones aprendidas
+de ediciones anteriores, lo que permitió identificar áreas de mejora en la organización. Asimismo,
+colaboré en la creación de un manual operativo que estandarizó los procedimientos para todos
+los involucrados, y participé en la reorganización del grupo de trabajo y en la definición de horarios de reuniones,
+asegurando una comunicación efectiva entre los miembros del equipo.
+
+Además, ayudé a establecer canales oficiales de comunicación internos para la coordinación logística
+del congreso y contribuí a la reestructuración del sitio web de la conferencia, mejorando su usabilidad
+y accesibilidad para ponentes y asistentes. Revisé presentaciones, semblanzas y biografías de los
+ponentes con el fin de catalogar los bloques que constituyeron los distintos ejes temáticos. Por último,
+organicé los bloques temáticos agrupando temas afines, reajusté horarios para evitar solapamientos entre
+sesiones y creé un formulario de registro para asistentes, simplificando el proceso de inscripción al evento.
+
+
+% Espacio para fotos de preparación
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{images/bloques.png}
+        \\[0.3em]
+        {\small Bloques del programa de la conferencia}
     \end{minipage}\hfill
-    \begin{minipage}{0.24\textwidth}
-        \includegraphics[width=\linewidth]{images/post2.png}
-    \end{minipage}\hfill
-    \begin{minipage}{0.24\textwidth}
-        \includegraphics[width=\linewidth]{images/post3.png}
-    \end{minipage}\hfill
-    \begin{minipage}{0.24\textwidth}
-        \includegraphics[width=\linewidth]{images/post4.png}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{images/philcomp.png}
+        \\[0.3em]
+        {\small Sitio web de la conferencia}
     \end{minipage}
+    \caption{Preparación previa a la conferencia.}
+    \label{fig:preparacion}
+\end{figure}
 
-    \vspace{0.5em}
+% ----------------------------------------------------------------
+\subsection{Promoción y difusión en redes sociales (octubre 2025)}
+% ----------------------------------------------------------------
 
-    \begin{minipage}{0.24\textwidth}
+En paralelo a la organización logística, me encargué de las actividades de comunicación y promoción
+del evento. Creé contenido visual y textual para redes sociales, principalmente Facebook, informando
+sobre fechas, horarios, ponentes y temas de la conferencia, y mantuve actualizada la página de Facebook con
+detalles sobre el programa y los materiales relacionados. Asimismo, realicé publicaciones periódicas
+para promocionar las distintas sesiones y conferencistas.
+
+En cuanto a la gestión de recursos, cotizé libretas, bolsas y materiales de bienvenida para los
+participantes, y busqué patrocinadores para contribuir al financiamiento del evento. Finalmente,
+ayude a enviar los correos electrónicos con el programa definitivo a ponentes y asistentes registrados, y preparé
+las invitaciones formales para el bloque inaugural de la conferencia.
+
+% Espacio para posts de redes sociales
+\vspace{0.5em}
+\begin{center}
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/post1.png}
+    \\[0.3em]
+    {\small Primera publicación en redes sociales, para anunciar la conferencia}
+\end{minipage}\hfill
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/post2.png}
+    \\[0.3em]
+    {\small Promoción de los ponentes Magistrales}
+\end{minipage}\hfill
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/post3.png}
+    \\[0.3em]
+    {\small Ejemplo de promoción de Keynotes}
+\end{minipage}
+\end{center}
+\vspace{0.5em}
+
+% ----------------------------------------------------------------
+\subsection{Actividades durante la conferencia (27 de octubre - 1 de noviembre)}
+% ----------------------------------------------------------------
+
+Durante los días del evento desempeñé funciones tanto de registro como de coordinación en sala.
+Me encargué de registrar a los asistentes a su llegada, verificando su inscripción y entregando
+los materiales de bienvenida. Fungí como encargada de diversas salas de conferencias, garantizando
+el correcto funcionamiento del equipo técnico de audio, video y proyección, y presenté formalmente
+a los ponentes antes de cada sesión, asegurando la fluidez del programa.
+
+Asimismo, coordiné con el equipo técnico para resolver contratiempos logísticos en tiempo real,
+apoyé a los ponentes con la preparación de sus materiales y atendí al público asistente durante
+los descansos y cambios de sesión, orientando a los participantes a lo largo del evento.
+
+También me encargué de pasar a las salas para tomar fotografías de las sesiones, los ponentes y el público asistente, 
+con el fin de documentar el evento y generar material para su difusión posterior.
+
+% Espacio para fotos del evento
+\vspace{0.5em}
+\begin{center}
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/post10.jpg}
+    \\[0.3em]
+    {\small Fotografía del evento}
+\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/post11.jpg}
+    \\[0.3em]
+    {\small Fotografía del evento}
+\end{minipage}
+\end{center}
+\vspace{0.5em}
+
+% ----------------------------------------------------------------
+\subsection{Actividades post-evento (noviembre 2025 - febrero 2026)}
+% ----------------------------------------------------------------
+
+Una vez concluida la conferencia, las actividades se concentraron en la difusión y cierre del evento.
+Durante el periodo del 2 al 6 de noviembre, recopilé y organicé el material fotográfico y audiovisual
+generado durante los días del evento para su posterior difusión; esto incluyó la edición de fotos y
+videos para su publicación en redes sociales y la página web, con el objetivo de ampliar el alcance
+de la conferencia.
+
+Posteriormente, en enero de 2026, me encargué de recopilar la información sobre la asistencia y
+participación de los ponentes para gestionar el envío de sus certificados de participación. Una vez
+verificados los datos, se coordinó el envío de certificados digitales a todos los ponentes y asistentes
+que cumplieron con los requisitos establecidos.
+
+\vspace{0.5em}
+\begin{center}
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/post9.png}
+    \\[0.3em]
+    {\small Material publicado en redes sociales}
+\end{minipage}\hfill
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/correo-certificado.png}
+    \\[0.3em]
+    {\small Certificados de participación}
+\end{minipage}\hfill
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/ensayo.png}
+    \\[0.3em]
+    {\small Ensayo divulgativo}
+\end{minipage}
+\end{center}
+
+\subsection{Otras actividades divulgativas (febrero - marzo 2026)}
+
+Finalmente, durante febrero y marzo de 2026, colaboré en la redacción de un ensayo divulgativo que
+servirá como base para la producción de videos cortos sobre los temas abordados en el Seminario de
+Filosofía de la Computación. Dicho material será publicado en redes sociales con el objetivo de acercar
+estos contenidos a un público más amplio.
+
+% ================================================================
+\section*{Evidencia adicional de actividades}
+% ================================================================
+
+A continuación se presentan capturas de pantalla de publicaciones en redes sociales y materiales
+relacionados con la organización y difusión de las conferencias.
+
+\begin{center}
+    \begin{minipage}{0.23\textwidth}
+        \includegraphics[width=\linewidth]{images/post4.png}
+    \end{minipage}\hfill
+    \begin{minipage}{0.23\textwidth}
         \includegraphics[width=\linewidth]{images/post5.png}
     \end{minipage}\hfill
-    \begin{minipage}{0.24\textwidth}
+    \begin{minipage}{0.23\textwidth}
         \includegraphics[width=\linewidth]{images/post6.png}
     \end{minipage}\hfill
-    \begin{minipage}{0.24\textwidth}
+    \begin{minipage}{0.23\textwidth}
         \includegraphics[width=\linewidth]{images/post7.png}
-    \end{minipage}\hfill
-    \begin{minipage}{0.24\textwidth}
-        \includegraphics[width=\linewidth]{images/post8.png}
     \end{minipage}
 
     \vspace{0.5em}
 
-    \begin{minipage}{0.32\textwidth}
-        \includegraphics[width=\linewidth]{images/post9.png}
+    \begin{minipage}{0.48\textwidth}
+        \includegraphics[width=\linewidth]{images/post8.png}
     \end{minipage}\hfill
-    \begin{minipage}{0.32\textwidth}
-        \includegraphics[width=\linewidth]{images/post10.jpg}
-    \end{minipage}\hfill
-    \begin{minipage}{0.32\textwidth}
-        \includegraphics[width=\linewidth]{images/post11.jpg}
+    \begin{minipage}{0.48\textwidth}
+        \includegraphics[width=\linewidth]{images/certificado.png}
     \end{minipage}
 \end{center}
 
-\bigskip
+\vspace{0.5em}
+
+% ---- FIRMAS ----
 \begin{center}
-  Atentamente,\\
+  Atentamente,
 \end{center}
+
+\vspace{0.5em}
+
 \begin{center}
     \begin{minipage}[t]{0.45\textwidth}
         \centering
         \rule{0.9\linewidth}{0.4pt}\\[0.5em]
         Laura Itzel Rodríguez Dimayuga \\
-        Estudiante de Ciencias de la Computación
+        Estudiante de Ciencias de la Computación\\
         Facultad de Ciencias, UNAM
     \end{minipage}\hfill
     \begin{minipage}[t]{0.45\textwidth}
         \centering
         \rule{0.9\linewidth}{0.4pt}\\[0.5em]
         M. en Fil. C. Enrique Francisco Soto Astorga \\
-        Profesor de Asignatura “A”
+        Profesor de Asignatura ``A''\\
         Facultad de Ciencias, UNAM
     \end{minipage}
 \end{center}
 
-\vspace{0.5cm}
+\vspace{0.5em}
 
 \noindent Ciudad Universitaria a 6 de abril de 2026, Ciudad de México.
 
