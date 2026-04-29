@@ -81,43 +81,69 @@ causales, o producen únicamente asociaciones estadísticas?
 
 \section{Justificación}
 
-Causal reasoning is believed to be one of the hallmarks of human intelligence [29, 68]. The ability to
-draw causal inferences from available information is crucial for scientific understanding and rational
-decision-making: for example, knowing whether smoking causes cancer might enable consumers
-to make a more informed decision [17, 18]; assessing the causal effect of a vaccine is essential for
-effective policy-making during a pandemic [14, 44, 72, 97]; and understanding the interplay behind
-family background, education and income helps devise effective education policies [10, 11, 30, 73].
-Our opening quote therefore mirrors the aspirations of many scientists in artificial intelligence
-and causal inference: to construct a machine capable of performing sound causal reasoning, and
-able to answer causal questions at scale and with ease. Recent advances in large language models
-(LLMs) have brought about a paradigm shift in natural language processing (NLP) and artificial
-intelligence [7, 15, 39, 56, 76, 103, inter alia]. These transformative developments raise the question
-of whether these machines are already capable of causal reasoning: Do LLMs understand causality?\textcite{jin2023cladder}
+Nuestra capacidad de razonar acerca del mundo y entenderlo viene de encontrar las relaciones de causa y efecto a partir
+de la experiencia \parencite{rosen2012anticipatory,pearl2009causality}. Esta capacidad de establecer relaciones causales y 
+lógicas entre los eventos del mundo se distingue cualitativamente del 
+asociativismo estadístico \parencite{penn2007causal}, y su ausencia en los sistemas de inteligencia 
+artificial ha sido señalada como una limitación estructural fundamental.
 
+A medida que el aprendizaje de máquinas ha avanzado, se ha buscado incorporar estos artefactos computacionales (LLM's o modelos predictivos de patrones de datos) para
+hacer ciencia: descubrir leyes naturales, automatizar la investigación y acelerar 
+el conocimiento empírico \parencite{bianchini2020deep, hey2009fourth,king2009automation,verma2025causal}. Sin embargo, la pregunta de si estos 
+modelos realmente identifican relaciones causales, o si simplemente capturan 
+regularidades estadísticas en los datos de entrenamiento, sigue abierta 
+\parencite{Jin2023CanLL, kiciman2023causal, halpern2016actual, 
+zhang2023understanding, willig2022can, hobbhahn2022investigating}. Parte de la dificultad radica en que la causalidad no es un concepto 
+universalmente definido, distintas disciplinas han desarrollado conceptualizaciones y 
+herramientas divergentes según el tipo de pregunta causal que buscan 
+responder \parencite{kiciman2023causal}. 
 
-Section: Many kinds of causality. The science of causality is the study of cause and effect relationships, and is a fundamental tool for understanding
-and reasoning about the world and how it works. Correct causal reasoning is crucial to making correct decisions,
-building robust systems, and scientific discovery itself. While advances in causal modeling have formalized core
-concepts of causality, the varying tasks and problems across domains have led different fields to use related but distinct
-conceptualizations and tools.
-Here we describe three orthogonal categories of causal approaches and tasks. The first axis (covariance- and logic-based
-causality) distinguishes methodological approaches that emphasize data analysis from those that emphasize logical
-reasoning. The second axis (type vs. token causality) 2 focuses on the setting for a causal question: Are we asking
-about causal relationships in general, such as for a population, or asking questions about specific causes for a specific
-event. The third axis, presented in Section 2.2 focus on the causal question or task itself: are we interested in inferring
-new relationships, characterizing the strength of specific known or hypothesized relationships, attributing blame or
-reward for some outcome, etc. \textcite{kiciman2023causal}
+Uno de los autores que más ha desarrollado una teoría formal de la 
+causalidad es Judea Pearl, cuyo trabajo surge precisamente de la 
+insatisfacción con la estadística asociativa como fundamento del 
+razonamiento científico. Pearl argumenta que las distribuciones de 
+probabilidad, por ricas que sean, no permiten responder preguntas sobre 
+intervenciones ni sobre contrafácticos, que son las preguntas que 
+importan en ciencia y en toma de decisiones \parencite{pearl2009causality, 
+pearl2018bookOfWhy}. Para articular esta distinción propone una jerarquía 
+de tres niveles: asociación (L1), que captura regularidades observacionales; 
+intervención (L2), que requiere razonar sobre los efectos de manipular el 
+sistema; y contrafactual (L3), que exige imaginar mundos alternativos (hipotéticos) al 
+observado. Cada nivel superior requiere información estructural que el 
+nivel inferior no puede proveer. \textcite{scholkopf2021toward} extiende 
+este argumento señalando que solo el conocimiento causal permite 
+generalizar más allá de la distribución observada y razonar sobre 
+situaciones hipotéticas. \textcite{jin2023cladder} sitúan esta jerarquía 
+en el centro del debate contemporáneo sobre LLMs, planteando directamente 
+si estos modelos son capaces de razonamiento causal genuino.
 
-Otros libros para meter de referencia sobre causalidad:
-\begin{itemize}
-  \item \cite{spirtes2000causation}
-  \item \cite{peters2017elements}
-  \item \cite{pearl2014probabilistic}
-  \item \cite{pearl2016causal}
-  \item \cite{pearl2018bookOfWhy}
-  \item \cite{pearl2009causality}
-  \item \cite{halpern2016actual}
-\end{itemize}
+Existen intentos recientes por integrar representaciones causales 
+estructurales en los LLMs con la expectativa de que logren inferencias 
+causales genuinas, sin embargo, estos intentos presentan limitaciones 
+metodológicas importantes: los experimentos se diseñan con lenguaje 
+artificial y clases restringidas de modelos causales estructurales que 
+no capturan la riqueza de las relaciones causales presentes en el 
+lenguaje natural ni en las estructuras causales del mundo real 
+\parencite{butkus2025causal}. Esta brecha entre el entorno de evaluación 
+y la complejidad causal del mundo, que cualquier modelo legítimo debería 
+preservar en el sentido de la relación de modelado de 
+\textcite{rosen2012anticipatory}, refuerza la hipótesis de que los 
+resultados favorables reportados subestiman la dificultad real del problema.
+
+Esta tesis adopta una posición teóricamente 
+fundamentada frente a esa ambigüedad, la plausibilidad superficial de las 
+respuestas causales de un LLM no implica comprensión estructural genuina. 
+Un sistema puede simular inferencia causal en el nivel asociativo (L1) sin 
+disponer de la representación mecanística que los niveles de intervención 
+(L2) y contrafactual (L3) exigen. Para establecer este argumento con 
+precisión, se integran tres marcos teóricos: 1) la relación de modelado de 
+\textcite{rosen2012anticipatory}, 2) la jerarquía causal de 
+\textcite{pearl2009causality} y 3) el principio de mecanismos causales 
+independientes de \textcite{scholkopf2021toward}, y se valida 
+empíricamente mediante el análisis de patrones de fallo en el benchmark 
+CLadder \parencite{jin2023cladder}, diseñado específicamente para evaluar 
+los tres niveles de razonamiento causal en modelos de lenguaje.
+
 \section{Resumen}
 
 Esta tesis examina si los grandes modelos de lenguaje (LLMs) satisfacen 
@@ -212,6 +238,20 @@ un fallo en las relaciones de intervención (L2) y contrafactual (L3).
     \item Material suplementario y tablas adicionales
   \end{enumerate}
 \end{enumerate}
+
+\section{Bibliografia principal}
+\begin{itemize}
+  \item \fullcite{spirtes2000causation}
+  \item \fullcite{peters2017elements}
+  \item \fullcite{pearl2014probabilistic}
+  \item \fullcite{pearl2016causal}
+  \item \fullcite{pearl2018bookOfWhy}
+  \item \fullcite{pearl2009causality}
+  \item \fullcite{halpern2016actual}
+  \item \fullcite{jin2023cladder}
+  \item \fullcite{scholkopf2021toward}
+\end{itemize}
+
 
 \printbibliography
 \end{document}
