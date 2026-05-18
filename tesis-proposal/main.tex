@@ -1,9 +1,11 @@
+% !TeX root = main.tex
 \documentclass{article}
 \usepackage{graphicx} % Required for inserting images
 \usepackage[spanish]{babel}
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{amssymb}
+\usepackage{csquotes}
 \usepackage{ dsfont }
 \usepackage{adjustbox}
 \usepackage[shortlabels]{enumitem}
@@ -44,7 +46,7 @@
 \textbf{Alumno}: Rodríguez Dimayuga Laura Itzel \\
 \textbf{Asesor}: M. en Fil. C. Enrique Francisco Soto Astorga }
 \renewcommand{\headrulewidth}{1pt}
-\pagenumbering{gobble}
+\pagenumbering{arabic}
 \AtBeginDocument{\vspace*{2\baselineskip}}
 
 \addbibresource{references.bib}
@@ -55,76 +57,149 @@ modelos de lenguaje.
 
 \section{Objetivo}
 
-Establecer un marco teórico que integra la noción de causalidad de \textcite{rosen2012anticipatory}, 
-la jerarquía causal de \textcite{pearl2009causality} y el principio ICM de \textcite{scholkopf2021toward}, para demostrar 
-que los LLMs operan exclusivamente en el nivel asociativo y carecen de la 
-representación mecanística que exige una relación de modelado legítima.
+Establecer un marco teórico que integre la noción de causalidad de \textcite{rosen2012anticipatory} 
+y la jerarquía causal de \textcite{pearl2009causality} para determinar si los grandes modelos de lenguaje (Large Language Models, LLMs) 
+tienen la capacidad de realizar inferencias causales legítimas.
 
 \subsection{Objetivo Secundario}
 
 Validar empíricamente el marco teórico mediante el análisis de los patrones de fallo 
-de los LLMs en el benchmark CLadder \parencite{jin2023cladder}. Construyendo un DAG para la visualización 
+de los LLM's en el benchmark CLadder \parencite{jin2023cladder}, que reúne 10 mil 
+muestras construidas a partir de grafos causales con consultas asociacionales, 
+intervencionales y contrafactuales; un motor oráculo produce las respuestas de 
+referencia y luego estas se expresan en lenguaje natural. Se hará una consulta a través de una API a 
+los LLMs para obtener sus respuestas, y se registrarán los patrones de fallo según el nivel causal (L1, L2, L3) y el subtipo de pregunta.
+Como contribución de este trabajo se planea construir un grafo acíclico dirigido 
+(Directed Acyclic Graph, DAG) para la visualización 
 que evidencie que dichos fallos no son aleatorios sino estructuralmente 
-concentrados en los niveles de intervención y contrafactuales, consistentemente con la ausencia de representación 
-mecanística predicha por el marco teórico.
+concentrados en los niveles de intervención y contrafactuales. 
 
 \section{Hipótesis}
 
-La hipótesis central sostiene que los grandes modelos de lenguaje (LLMs) no 
-son capaces de realizar inferencia causal genuina, sino que operan exclusivamente 
-en el nivel de las asociaciones estadísticas, el primer escalón de la jerarquía causal de Pearl.
+La hipótesis central es que los LLMs operan predominantemente en el nivel asociativo (L1) 
+de la jerarquía causal de \textcite{pearl2009causality}, y que sus fallos se concentran en tareas 
+de intervención (L2) y contrafactuales (L3) siendo consistente con la ausencia de 
+representación mecanística, en el sentido de la relación de modelado de \textcite{rosen2012anticipatory}.
 
 \section{Pregunta Central}
 
-¿Satisfacen los grandes modelos de lenguaje los criterios requeridos para generar modelos 
-causales, o producen únicamente asociaciones estadísticas?
+¿Qué criterios establece la integración entre la relación de modelado de \textcite{rosen2012anticipatory} y 
+la jerarquía causal de \textcite{pearl2009causality} para distinguir inferencia causal genuina de una asociación estadística simulada en el lenguaje, 
+y en qué medida esa distinción es empíricamente verificable mediante el análisis de patrones de fallo en el benchmark CLadder \parencite{jin2023cladder}.?
 
 \section{Justificación}
 
 Nuestra capacidad de razonar acerca del mundo y entenderlo viene de encontrar las relaciones de causa y efecto a partir
-de la experiencia \parencite{rosen2012anticipatory,pearl2009causality}. Esta capacidad de establecer relaciones causales y 
+de la experiencia \parencite{rosen2012anticipatory,pearl2009causality, spirtes2000causation}. 
+Esta capacidad de establecer relaciones causales y 
 lógicas entre los eventos del mundo se distingue cualitativamente del 
 asociativismo estadístico \parencite{penn2007causal}, y su ausencia en los sistemas de inteligencia 
-artificial ha sido señalada como una limitación estructural fundamental.
+artificial ha sido señalada como una limitación estructural fundamental \parencite{Zecevic2023CausalPL, li2023counterfactual}.
 
-A medida que el aprendizaje de máquinas ha avanzado, se ha buscado incorporar estos artefactos computacionales (LLM's o modelos predictivos de patrones de datos) para
+A medida que el aprendizaje de máquinas ha avanzado, se ha buscado incorporar estos artefactos 
+computacionales (LLM's o modelos predictivos de patrones de datos) para
 hacer ciencia: descubrir leyes naturales, automatizar la investigación y acelerar 
-el conocimiento empírico \parencite{bianchini2020deep, hey2009fourth,king2009automation,verma2025causal}. Sin embargo, la pregunta de si estos 
+el conocimiento empírico \parencite{hey2009fourth,king2009automation,verma2025causal}. 
+Sin embargo, la pregunta de si estos 
 modelos realmente identifican relaciones causales, o si simplemente capturan 
 regularidades estadísticas en los datos de entrenamiento, sigue abierta 
-\parencite{Jin2023CanLL, kiciman2023causal, halpern2016actual, 
-zhang2023understanding, willig2022can, hobbhahn2022investigating}. Parte de la dificultad radica en que la causalidad no es un concepto 
+\parencite{kiciman2023causal,chen2024clear, hobbhahn2022investigating, li2023counterfactual}. 
+Parte de la dificultad radica en que la causalidad no es un concepto 
 universalmente definido, distintas disciplinas han desarrollado conceptualizaciones y 
 herramientas divergentes según el tipo de pregunta causal que buscan 
-responder \parencite{kiciman2023causal}. 
+responder \parencite{halpern2016actual,peters2017elements}. De acuerdo con \textcite{kiciman2023causal}, algunos de los tipos de causalidad que los investigadores han intentado formalizar incluyen:
+
+\begin{itemize}
+	\item \textbf{Marco causal:} El conjunto de eventos causales candidatos 
+  relevantes para un resultado particular. Los modelos causales estructurales (SCM) 
+  requieren que las causas relevantes se incluyan como variables internas al sistema, 
+  pero en la práctica los humanos utilizan conocimiento del dominio  y sentido común (variables externas) para establecer el marco causal 
+  después de que el resultado ocurre.
+	\item \textbf{Causalidad necesaria:} Si un evento candidato necesitaba ocurrir para que el resultado sucediera.
+	\item \textbf{Causalidad suficiente:} Si la ocurrencia de un evento candidato hubiera llevado al resultado si otros eventos causales hubieran ocurrido de manera diferente.
+	\item \textbf{Normalidad:} El grado en el que los eventos causales se alinean con normas estadísticas o normativas (normas sociales, morales o legales). Cuando los agentes violan normas, típicamente se les juzga como causas más directas de los resultados.
+	\item \textbf{Otros factores humanos:} Incluyendo sesgo hacia la acción, manejo de intención y estado epistémico, e interpretación de resultados negativos. Los humanos tienden a atribuir más causalidad a acciones que a omisiones de acciones, y también consideran si el agente actuó con intención y conocimiento de lo que hacía.
+\end{itemize}
 
 Uno de los autores que más ha desarrollado una teoría formal de la 
-causalidad es Judea Pearl, cuyo trabajo surge precisamente de la 
-insatisfacción con la estadística asociativa como fundamento del 
-razonamiento científico. Pearl argumenta que las distribuciones de 
-probabilidad, por ricas que sean, no permiten responder preguntas sobre 
-intervenciones ni sobre contrafácticos, que son las preguntas que 
-importan en ciencia y en toma de decisiones \parencite{pearl2009causality, 
-pearl2018bookOfWhy}. Para articular esta distinción propone una jerarquía 
+causalidad es Judea Pearl \parencite{pearl2009causality}, cuyo trabajo surge precisamente de la 
+insatisfacción con la estadística asociativa como único fundamento del 
+razonamiento científico. Pearl critica las limitaciones de los modelos 
+de ecuaciones estructurales (structural equation modeling, SEM), que se restringen 
+a la predicción observacional sin permitir un razonamiento anticipatorio sobre distintos escenarios.
+ Argumenta que las distribuciones de probabilidad, por ricas que sean, 
+son insuficientes para responder las preguntas que realmente importan en ciencia y en 
+toma de decisiones \parencite{pearl2009causality, pearl2018bookOfWhy}. 
+
+Para articular esta distinción propone una jerarquía 
 de tres niveles: asociación (L1), que captura regularidades observacionales; 
 intervención (L2), que requiere razonar sobre los efectos de manipular el 
 sistema; y contrafactual (L3), que exige imaginar mundos alternativos (hipotéticos) al 
 observado. Cada nivel superior requiere información estructural que el 
-nivel inferior no puede proveer. \textcite{scholkopf2021toward} extiende 
-este argumento señalando que solo el conocimiento causal permite 
-generalizar más allá de la distribución observada y razonar sobre 
-situaciones hipotéticas. \textcite{jin2023cladder} sitúan esta jerarquía 
-en el centro del debate contemporáneo sobre LLMs, planteando directamente 
+nivel inferior no puede proveer \parencite{pearl2018theoretical}. 
+
+Para definir y formalizar la causalidad, \textcite{pearl2009causality} introduce el concepto de modelo causal. 
+En primer lugar, define la estructura causal como:
+
+\begin{quote}
+\textbf{Definición 2.2.1 (Estructura causal).}
+\textit{Una estructura causal de un conjunto de variables $V$ es un grafo 
+acíclico dirigido (DAG) en el cual cada nodo corresponde a un elemento distinto 
+de $V$, y cada arista representa una relación funcional directa entre las 
+variables correspondientes.}
+
+\hfill\footnotesize{(Traducción propia de \textcite[p.~44]{pearl2009causality}).}
+\end{quote}
+
+Luego define el modelo causal como: 
+
+\begin{quote}
+\textbf{Definición 2.2.2 (Modelo causal).} 
+\textit{Un modelo causal es un par $M = \langle D, \Theta_D \rangle$ que consiste en una estructura 
+causal $D$ y un conjunto de parámetros $\Theta_D$ compatibles con $D$. Los parámetros $\Theta_D$ asignan una 
+función $x_i = f_i(pa_i, u_i)$ a cada $X_i \in V$ y una medida de probabilidad $P(u_i)$ a cada $u_i$, donde $PA_i$ 
+son los padres de $X_i$ en $D$ y donde cada $U_i$ es una perturbación aleatoria distribuida de acuerdo con $P(u_i)$, 
+independientemente de todas las demás $u$.}
+
+\hfill\footnotesize{(Traducción propia de \textcite[p.~44]{pearl2009causality}).}
+\end{quote}
+
+En este marco, la inferencia causal se define como: 
+
+\begin{quote}
+\textbf{Definición 2.3.1 (Causalidad inferida).}
+\textit{Se dice que una variable $X$ tiene influencia causal sobre una variable $Y$ si existe un camino dirigido de $X$ a $Y$ en toda estructura minimal consistente con los datos.}
+
+\hfill\footnotesize{(Traducción propia de \textcite[p.~45]{pearl2009causality}).}
+\end{quote}
+\textcite{scholkopf2021toward} señala que la inferencia causal es un requerimiento fundamental para la inteligencia artificial, en especial, 
+para la generalización fuera de distribución. Es decir para crear un sistema que pueda aprender de un entorno y luego aplicar ese conocimiento 
+a otro entorno diferente, lo cual es una capacidad esencial para la inteligencia general. \textcite{jin2023cladder} coloca esta cuestión
+en el centro del debate contemporáneo sobre LLM's, planteando directamente 
 si estos modelos son capaces de razonamiento causal genuino.
+
+Por otro lado, la noción de causalidad en \textcite{rosen2012anticipatory} surge de la estructura misma de los sistemas naturales 
+(natural systems, $NS$). Para Rosen, un sistema natural (NS) es una colección de cualidades a las cuales se les pueden imputar relaciones definidas. 
+Las cualidades perceptibles (\textit{percepts}) son los \textit{observables} del sistema, y las relaciones que los vinculan 
+ constituyen las \textit{leyes del sistema}, expresadas como ecuaciones de estado. Son precisamente estos 
+ vínculos (\textit{linkages}) entre observables los que encarnan la noción de \textbf{causalidad}. En este sentido, 
+la causa no es una propiedad primitiva del mundo, sino una relación funcional que emerge de la estructura del sistema natural.
+
+Esta concepción tiene una consecuencia directa para la inteligencia artificial, un sistema que solo aprende 
+distribuciones estadísticas sobre texto no captura los vínculos funcionales reales entre observables del mundo. 
+Para que un modelo sea causalmente legítimo en sentido roseniano, debe preservar la estructura de vínculos del 
+sistema natural que pretende representar mediante la \textit{relación de modelado}: una correspondencia entre 
+la estructura inferencial del sistema formal y la estructura causal del sistema natural. La violación de esta 
+correspondencia es, precisamente, la limitación estructural que esta tesis atribuye a los LLMs.
 
 Existen intentos recientes por integrar representaciones causales 
 estructurales en los LLMs con la expectativa de que logren inferencias 
-causales genuinas, sin embargo, estos intentos presentan limitaciones 
+causales, sin embargo, estos intentos presentan limitaciones 
 metodológicas importantes: los experimentos se diseñan con lenguaje 
 artificial y clases restringidas de modelos causales estructurales que 
 no capturan la riqueza de las relaciones causales presentes en el 
 lenguaje natural ni en las estructuras causales del mundo real 
-\parencite{butkus2025causal}. Esta brecha entre el entorno de evaluación 
+\parencite{butkus2025causal, li2023counterfactual}. Esta brecha entre el entorno de evaluación 
 y la complejidad causal del mundo, que cualquier modelo legítimo debería 
 preservar en el sentido de la relación de modelado de 
 \textcite{rosen2012anticipatory}, refuerza la hipótesis de que los 
@@ -136,55 +211,12 @@ respuestas causales de un LLM no implica comprensión estructural genuina.
 Un sistema puede simular inferencia causal en el nivel asociativo (L1) sin 
 disponer de la representación mecanística que los niveles de intervención 
 (L2) y contrafactual (L3) exigen. Para establecer este argumento con 
-precisión, se integran tres marcos teóricos: 1) la relación de modelado de 
-\textcite{rosen2012anticipatory}, 2) la jerarquía causal de 
-\textcite{pearl2009causality} y 3) el principio de mecanismos causales 
-independientes de \textcite{scholkopf2021toward}, y se valida 
+precisión, se integra un marco teórico conjunto entre: 1) la relación de modelado de 
+\textcite{rosen2012anticipatory}, y la 2) la jerarquía causal de 
+\textcite{pearl2009causality}, y se valida 
 empíricamente mediante el análisis de patrones de fallo en el benchmark 
 CLadder \parencite{jin2023cladder}, diseñado específicamente para evaluar 
 los tres niveles de razonamiento causal en modelos de lenguaje.
-
-\section{Resumen}
-
-Esta tesis examina si los grandes modelos de lenguaje (LLMs) satisfacen 
-los criterios requeridos para la inferencia causal, o si únicamente producen asociaciones estadísticas. 
-La hipótesis es que los LLMs no satisfacen los criterios requeridos para la inferencia causal. 
-Debido a que operan sobre una distribución observacional comprimida en \textit{tokens} que les 
-permite producir respuestas casualmente plausibles en el nivel de 
-asociación (L1), pero carecen de la representación mecanística que 
-exigen los niveles de intervención (L2) y contrafactual (L3) de la 
-jerarquía de \textcite{pearl2009causality}. El trabajo integra dos componentes.
-
-El \textbf{primero} es un marco teórico que articula, a partir de la relación de 
-modelado de \textcite{rosen2012anticipatory}, el modelo causal de 
-\textcite{pearl2009causality} y el principio de mecanismos causales 
-independientes de \textcite{scholkopf2021toward}, un criterio formal para 
-distinguir inferencia causal de simulación predictiva. El argumento 
-central es que la distinción no se resuelve con una optimización sino que viene 
-desde la arquitectura; un sistema con comprensión estructural dispone de una representación  
-\textit{mecanística}, la capacidad de un sistema de representar internamente 
-las funciones estructurales que determinan el valor de cada variable 
-a partir de sus causas,  $X_i := f_i(\text{PA}_i, U_i)$ que componen el modelo causal estructural (SCM) \parencite{pearl2000causality}. 
-En cambio, un LLM dispone de una distribución de probabilidad sobre tokens optimizada para predecir texto 
-humano.
-
-El \textbf{segundo} es un componente computacional que implementa un programa de 
-evaluación sobre el benchmark CLadder \parencite{jin2023cladder}, diseñado 
-explícitamente sobre la jerarquía causal de \textcite{pearl2009causality} 
-para evaluar los tres niveles de razonamiento causal en modelos de lenguaje: asociación (L1), 
-intervención (L2) y contrafactual (L3). El programa consulta LLMs mediante 
-API, clasifica sus respuestas según el nivel causal requerido, y construye 
-un grafo acíclico dirigido (DAG) de patrones de fallo que visualiza en qué 
-niveles de la jerarquía causal fallan.  
-La implementación utiliza \texttt{networkx} para la construcción del grafo 
-y la API de un LLM  para las consultas. 
-
-Los resultados empíricos se interpretaran con apoyo del marco teórico para 
-argumentar que los fallos observados no son aleatorios sino estructuralmente 
-consistentes con la hipótesis principal: los LLMs se concentran 
-sistemáticamente en el nivel de asociación (L1) de la jerarquía de Pearl y exhiben 
-un fallo en las relaciones de intervención (L2) y contrafactual (L3). 
-
 
 \section{Índice tentativo}
 \begin{enumerate}
@@ -193,18 +225,17 @@ un fallo en las relaciones de intervención (L2) y contrafactual (L3).
     \item Contexto histórico y científico del trabajo
     \item Objetivos y preguntas de investigación
     \item Hipótesis
-    \item Estructura de la tesis
+    % \item Estructura de la tesis
   \end{enumerate}
-  \item Marco teórico
+  \item Antecedentes 
   \begin{enumerate}
     \item Definición de causalidad
     \item La jerarquía causal de Pearl
-    \item Modelo causal estructural y funciones mecanísticas
+    \item Modelo causal estructural 
     \item Relación de modelado de Rosen
-    \item Principio de mecanismos causales independientes (ICM)
     \item Integración teórica y criterio para inferencia causal vs simulación predictiva
   \end{enumerate}
-  \item Metodología
+  \item Experimentación
   \begin{enumerate}
     \item Benchmark CLadder y categorización de preguntas
     \item Selección de subconjunto representativo por nivel causal
@@ -239,18 +270,12 @@ un fallo en las relaciones de intervención (L2) y contrafactual (L3).
   \end{enumerate}
 \end{enumerate}
 
-\section{Bibliografia principal}
-\begin{itemize}
-  \item \fullcite{spirtes2000causation}
-  \item \fullcite{peters2017elements}
-  \item \fullcite{pearl2014probabilistic}
-  \item \fullcite{pearl2016causal}
-  \item \fullcite{pearl2018bookOfWhy}
-  \item \fullcite{pearl2009causality}
-  \item \fullcite{halpern2016actual}
-  \item \fullcite{jin2023cladder}
-  \item \fullcite{scholkopf2021toward}
-\end{itemize}
+% \section{Bibliografia principal}
+% \begin{itemize}
+%   \item \fullcite{peters2017elements}
+%   \item \fullcite{pearl2014probabilistic}
+%   \item \fullcite{pearl2016causal}
+% \end{itemize}
 
 
 \printbibliography

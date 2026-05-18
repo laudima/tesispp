@@ -1,0 +1,40 @@
+\section{Resumen}
+
+Esta tesis examina si los grandes modelos de lenguaje (LLMs) satisfacen 
+los criterios requeridos para la inferencia causal, o si únicamente producen asociaciones estadísticas. 
+La hipótesis es que los LLMs no satisfacen los criterios requeridos para la inferencia causal. 
+Debido a que operan sobre una distribución observacional comprimida en \textit{tokens} que les 
+permite producir respuestas casualmente plausibles en el nivel de 
+asociación (L1), pero carecen de la representación mecanística que 
+exigen los niveles de intervención (L2) y contrafactual (L3) de la 
+jerarquía de \textcite{pearl2009causality}. El trabajo integra dos componentes.
+
+El \textbf{primero} es un marco teórico que articula, a partir de la relación de 
+modelado de \textcite{rosen2012anticipatory}, el modelo causal de 
+\textcite{pearl2009causality} y el principio de mecanismos causales 
+independientes de \textcite{scholkopf2021toward}, un criterio formal para 
+distinguir inferencia causal de simulación predictiva. El argumento 
+central es que la distinción no se resuelve con una optimización sino que viene 
+desde la arquitectura; un sistema con comprensión estructural dispone de una representación  
+\textit{mecanística}, la capacidad de un sistema de representar internamente 
+las funciones estructurales que determinan el valor de cada variable 
+a partir de sus causas,  $X_i := f_i(\text{PA}_i, U_i)$ que componen el modelo causal estructural (SCM) \parencite{pearl2000causality}. 
+En cambio, un LLM dispone de una distribución de probabilidad sobre tokens optimizada para predecir texto 
+humano.
+
+El \textbf{segundo} es un componente computacional que implementa un programa de 
+evaluación sobre el benchmark CLadder \parencite{jin2023cladder}, diseñado 
+explícitamente sobre la jerarquía causal de \textcite{pearl2009causality} 
+para evaluar los tres niveles de razonamiento causal en modelos de lenguaje: asociación (L1), 
+intervención (L2) y contrafactual (L3). El programa consulta LLMs mediante 
+API, clasifica sus respuestas según el nivel causal requerido, y construye 
+un grafo acíclico dirigido (DAG) de patrones de fallo que visualiza en qué 
+niveles de la jerarquía causal fallan.  
+La implementación utiliza \texttt{networkx} para la construcción del grafo 
+y la API de un LLM  para las consultas. 
+
+Los resultados empíricos se interpretaran con apoyo del marco teórico para 
+argumentar que los fallos observados no son aleatorios sino estructuralmente 
+consistentes con la hipótesis principal: los LLMs se concentran 
+sistemáticamente en el nivel de asociación (L1) de la jerarquía de Pearl y exhiben 
+un fallo en las relaciones de intervención (L2) y contrafactual (L3). 
