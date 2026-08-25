@@ -13,7 +13,6 @@
         "Itzel",
         "mecanística",
         "networkx",
-        "scholkopf",
         "Schölkopf",
         "UNAM"
     ], 
@@ -26,9 +25,18 @@
                 "-interaction=nonstopmode",
                 "-file-line-error",
                 "-pdf",
+                "-pdflatex=/Library/TeX/texbin/pdflatex %O %S",
+                "-e",
+                "$biber=\"/Library/TeX/texbin/biber %O %S\";",
+                "-e",
+                "$bibtex=\"/Library/TeX/texbin/bibtex %O %S\";",
                 "-outdir=%OUTDIR%",
                 "%DOC%"
             ]
         }
-    ]
+    ],
+    "latex-workshop.latex.clean.command": "/Library/TeX/texbin/latexmk",
+    "latex-workshop.latex.env": {
+        "PATH": "/Library/TeX/texbin:${env:PATH}"
+    }
 }

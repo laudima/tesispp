@@ -1,0 +1,76 @@
+\documentclass{llncs}
+%
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+%
+\begin{document}
+%
+\title{Diagnosing Causal Reasoning Failures in Large Language Models: Implications for LLM-Assisted Causal Discovery}
+%
+\titlerunning{Diagnosing Causal Reasoning Failures in LLMs}
+%
+\author{Laura Itzel Rodríguez Dimayuga\orcidID{0009-0007-0122-5294} \and Enrique Francisco Soto Astorga}
+%
+\authorrunning{L. I. Rodríguez Dimayuga and E. F. Soto Astorga}
+%
+\institute{Facultad de Ciencias, Universidad Nacional Autónoma de México, Ciudad de México, México\\
+\email{laudima@ciencias.unam.mx}}
+%
+\maketitle
+%
+\begin{abstract}
+Causal discovery methods increasingly rely on background knowledge to compensate for the fact that observational data alone cannot, in general, identify a unique causal structure. Large language models (LLMs) are progressively used as a convenient source of such background knowledge, proposing causal edges, priors, or full graphs from variable names and textual descriptions. This growing practice presupposes that LLMs possess causal competence rather than sophisticated pattern completion, an assumption that remains empirically and theoretically underexamined. We present a preliminary, proof-of-concept framework for diagnosing whether LLM causal judgments reflect genuine causal reasoning or associative mimicry. The framework integrates Judea Pearl's Ladder of Causation, which distinguishes associational (L1), interventional (L2), and counterfactual (L3) reasoning, with Robert Rosen's modeling relation, which requires that a legitimate model preserve the structural linkages of the natural system it represents. We derive from this integration a falsifiable prediction: if LLMs operate predominantly at L1, their failures on causal benchmarks should concentrate structurally at L2 and L3 rather than being uniformly distributed. We describe an evaluation protocol, built on the CLadder benchmark, that queries LLMs across causal levels and visualizes failure clustering as a directed acyclic graph (DAG) of failure co-occurrence. We report on the current, pre-empirical stage of this work and discuss its relevance for practitioners who use LLMs to elicit causal priors in hybrid causal discovery pipelines.
+
+\keywords{Causal discovery \and Large language models \and Causal reasoning \and Pearl's causal hierarchy \and Benchmark evaluation \and CLadder \and Rosen's modeling relation}
+\end{abstract}
+%
+\section{Introduction and Motivation}
+
+Observational data alone does not, in general, identify a unique causal 
+structure. Distinct DAGs can be Markov equivalent and thus indistinguishable 
+from the observed distribution \cite{spirtes2000causation,glymour2019review,verma1990equivalence}. Discovery algorithms address this non-identifiability 
+with interventions, temporal information, or background knowledge that orients
+edges and prunes the equivalence class \cite{spirtes2016causal}. Such 
+background knowledge has traditionally come from human domain experts; 
+recently, LLMs have been proposed as a scalable substitute, queried for 
+pairwise orientation, edge priors, or full causal graphs from variable names 
+and textual metadata, with their outputs fed directly into discovery pipelines 
+\cite{long2023can,kiciman2023causal,verma2025causal,butkus2025causal}. This 
+practice silently presupposes that LLMs possess causal competence comparable to 
+a domain expert. Though some report encouraging 
+benchmark performance \cite{kiciman2023causal}, while others argue that
+apparent competence is explainable by surface-level statistical association
+rather than genuine causal inference \cite{Zecevic2023CausalPL,willig2022can,li2023counterfactual,chen2024clear,hobbhahn2022investigating}. Rather than 
+resolve this dispute empirically, we contribute a theoretically motivated 
+diagnostic framework and evaluation protocol aimed at determining \emph{where}, structurally, LLM causal reasoning fails, making the epistemic risk of LLM-assisted causal discovery explicit and testable.
+
+
+\section{Theoretical Framework}
+
+Pearl organizes causal reasoning into three layers of increasing informational demand \cite{pearl2009causality,pearl2018bookOfWhy}: \emph{association} (L1), regularities of $P(y \mid x)$; \emph{intervention} (L2), the effect of actively setting a variable, $P(y \mid do(x))$, which requires knowledge beyond any observational distribution; and \emph{counterfactual} (L3), reasoning about a specific unit under a hypothetical alternative, $P(y_x \mid x', y')$, which presupposes a fully specified structural causal model. No amount of L1 information determines L2 or L3 quantities without additional structural assumptions \cite{pearl2018theoretical}: a system could \emph{appear} causally competent while operating strictly at L1, reproducing correct associational answers while lacking the structural information L2/L3 queries require.
+
+Independently, Rosen's theory of anticipatory systems locates causality not in a primitive property of events but in the \emph{linkages} between the observable qualities of a natural system, expressed as its laws of state change \cite{rosen2012anticipatory}. A model is causally legitimate only insofar as a \emph{modeling relation} holds: a structure-preserving correspondence between inferential entailment in the formal system and causal entailment in the natural system it represents. A model that reproduces surface observables without preserving this correspondence is not a causal model of the system, regardless of predictive accuracy.
+
+Together, the frameworks conform a theoretical foundation for diagnosing the limitations of LLM causal reasoning. Pearl's hierarchy specifies \emph{what} information a causal system must encode beyond association; Rosen's modeling relation specifies \emph{why} a system that merely mimics correct L1 answers cannot be expected to satisfy L2/L3 queries reliably, since doing so is not underwritten by any structural correspondence with the system it describes. This yields the testable prediction organizing our protocol: \emph{if an LLM's causal competence is L1-bound, its errors on a stratified causal benchmark should be structurally concentrated at L2 and L3, not uniformly distributed across levels and subtypes.} Uniform errors would instead suggest generic task difficulty, weakening the associative-mimicry account.
+
+\section{Evaluation Protocol and Proof of Concept}
+
+We operationalize this criterion using CLadder \cite{jin2023cladder}, roughly 10,000 items generated from causal graphs paired with associational, interventional, and counterfactual queries, each with a ground-truth answer from a symbolic oracle. Unlike naturalistic-text benchmarks, CLadder's ground truth is tied directly to an explicit graph and query type, letting failures be attributed to a specific hierarchy level and graph topology rather than to question ambiguity.
+
+The planned pipeline: (i) sample a stratified subset of CLadder across levels (L1/L2/L3) and subtypes; (ii) submit each item to one or more LLMs via API under a fixed prompting protocol; (iii) score responses against the oracle and log level, subtype, and graph topology; (iv) aggregate failures into a directed graph, built with \texttt{networkx}, whose nodes represent (level, subtype, topology) strata, used to visualize whether errors cluster at L2/L3 or spread diffusely. This failure DAG exposes the \emph{shape} of the model's error surface rather than recovering any object-level causal structure.
+
+This paper reports work at the design and proof-of-concept stage: the theoretical integration, sampling design, and failure-DAG pipeline are specified, while the API-querying and full-scale empirical run are in progress as part of an ongoing undergraduate thesis at Facultad de Ciencias, UNAM. We refrain from reporting preliminary numerical results to avoid presenting underpowered figures; the contribution at this stage is the framework and protocol, offered for discussion ahead of the empirical phase.
+
+\section{Relevance to Causal Discovery and Conclusion}
+
+This work bears directly on the growing practice of using LLMs as sources of expert-like background knowledge in hybrid causal discovery pipelines \cite{long2023can,verma2025causal,butkus2025causal,zhang2023understanding}. If most of an LLM’s apparent causal ability is just associational, then priors extracted from it may work well for tasks that mainly reflect how often concepts co-occur in its training data; but should not be trusted, without separate, external confirmation validation, for orienting edges or resolving Markov-equivalence classes, tasks that are intrinsically interventional or counterfactual. Framing the diagnosis in terms of Pearl's hierarchy yields a criterion portable across models and benchmarks, and the failure-DAG visualization offers a reusable auditing tool for characterizing \emph{where} a model's causal competence breaks down before it is used as a knowledge source. Future work will complete the empirical run across multiple LLM families, report results by level and subtype, and examine whether failure DAGs generalize across models, informing guidance for the use of LLM-elicited priors in causal discovery.
+
+%
+% ---- Bibliography ----
+%
+\bibliographystyle{splncs04}
+\bibliography{references}
+\end{document}
