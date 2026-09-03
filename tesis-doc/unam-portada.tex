@@ -1,0 +1,123 @@
+% Paginas preliminares de la tesis.
+\pagestyle{empty}
+\pagenumbering{roman}
+
+\begin{titlepage}
+  \newgeometry{
+    top=1cm,
+    bottom=1cm,
+    left=1cm,
+    right=1cm
+  }
+  \noindent
+  \begin{minipage}[t]{0.22\textwidth}
+    \centering
+    \includegraphics[height=4cm]{images/Logo_UNAM.png}
+    \newline
+    \newline
+    \hspace*{0.8cm}\rule{0.4pt}{15.5cm}\hspace{0.3cm}\rule{1.5pt}{15.5cm}\hspace{0.3cm}\rule{0.4pt}{15.5cm}
+    \newline
+    \newline
+    \includegraphics[height=4cm]{images/Logo_FC.png}
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[t]{0.70\textwidth}
+    \centering
+      \vspace{-3cm}
+    \textsc{\large UNIVERSIDAD NACIONAL AUTÓNOMA\\ DE MÉXICO}
+
+    \vspace{0.12cm}
+    \rule{0.96\linewidth}{1.2pt}
+    \vspace{0.12cm}
+    \rule{0.96\linewidth}{0.4pt}
+
+    \vspace{0.5cm}
+    \textsc{\large FACULTAD DE CIENCIAS\\}
+      \vspace{2cm}
+      {\normalsize\bfseries VISUALIZACIÓN DE PATRONES DE FALLO DE INFERENCIAS CAUSALES EN GRANDES 
+      MODELOS DE LENGUAJE.}
+
+      \vspace{2cm}
+      \hspace{4cm}
+
+      {\Huge \bfseries T E S I S}
+
+      \vspace{1cm}
+      {\normalsize QUE PARA OBTENER EL TÍTULO DE:}
+
+      \vspace{1cm}
+      {\normalsize{LICENCIADA EN CIENCIAS DE LA COMPUTACIÓN}}
+
+      \vspace{3.5cm}
+      {\normalsize P R E S E N T A:}
+
+      \vspace{0.3cm}
+      {\large\bfseries LAURA ITZEL RODRÍGUEZ DIMAYUGA}\\
+
+      \vspace{1cm}
+      {\normalsize TUTOR:}\\[0.15cm]
+      {\large\bfseries M. en Fil. C. ENRIQUE FRANCISCO SOTO ASTORGA}\\
+
+      \vspace{1cm}
+      {\large 2026}
+  \end{minipage}
+  \vspace{-2.0cm}
+  \hspace{0.02\textwidth}
+\end{titlepage}
+
+\pagestyle{plain}
+\setcounter{page}{2}
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Declaración de autoría}
+\begin{center}\textbf{Declaración de autoría}\end{center}
+Declaro que este trabajo es de mi autoría y que las fuentes utilizadas se encuentran debidamente citadas. Esta es una copia fiel del trabajo, incluyendo las revisiones requeridas por el comité evaluador.
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Resumen}
+\begin{center}\textbf{Resumen}\end{center}
+% Escribe aquí el resumen de la tesis.
+[Escribir resumen]
+
+\vspace{1em}
+\noindent\textbf{Palabras clave:} causalidad, modelos de lenguaje, inferencia causal, CLadder.
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Agradecimientos}
+\begin{center}\textbf{Agradecimientos}\end{center}
+[Escribir agradecimientos]
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Dedicatoria}
+\begin{center}\textbf{Dedicatoria}\end{center}
+[Escribir dedicatoria]
+
+\cleardoublepage
+\phantomsection
+\renewcommand\contentsname{Contenido}
+\tableofcontents
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Lista de figuras}
+\listoffigures
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Lista de tablas}
+\listoftables
+
+\cleardoublepage
+\phantomsection
+\renewcommand*{\abbreviationsname}{Lista de abreviaturas}
+\printglossary[type=abbreviations]
+
+\cleardoublepage
+\phantomsection
+\printglossary[type=symbols]
+
+\pagenumbering{arabic}
