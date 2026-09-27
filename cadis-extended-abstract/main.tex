@@ -5,11 +5,24 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{subcaption}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.75}
+\setcounter{topnumber}{3}
+\setcounter{totalnumber}{4}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc,decorations.pathreplacing}
 \setlength{\fboxsep}{6pt}
 \newsavebox{\editorcommentbox}
 \newenvironment{editorcomment}
     {\begin{lrbox}{\editorcommentbox}\begin{minipage}{0.95\linewidth}\small}
     {\end{minipage}\end{lrbox}\par\medskip\noindent\fbox{\usebox{\editorcommentbox}}\par\medskip}
+% Placeholder marker for values that depend on runs not yet completed. Remove before submission.
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 %
 \begin{document}
 %
@@ -17,208 +30,300 @@
 %
 \titlerunning{Diagnosing Causal Reasoning Failures in LLMs}
 %
-\author{Laura Itzel Rodríguez Dimayuga\inst{1}\orcidID{0009-0007-0122-5294} \and Enrique Francisco Soto Astorga\inst{2}\orcidID{0000-0002-1270-8706}}
+\author{Laura Itzel Rodríguez Dimayuga\inst{1}\orcidID{0009-0007-0122-5294} \and Enrique Francisco Soto Astorga\inst{1}\orcidID{0000-0002-1270-8706}}
 %
 \authorrunning{L. I. Rodríguez Dimayuga and E. F. Soto Astorga}
 %
 \institute{Facultad de Ciencias, Universidad Nacional Autónoma de México, Ciudad de México, México\\
-\email{laudima@ciencias.unam.mx} \and
-Facultad de Ciencias, Universidad Nacional Autónoma de México, Ciudad de México, México\\
-\email{astorga@ciencias.unam.mx}}
+\email{\{laudima,astorga\}@ciencias.unam.mx} }
 %
 \maketitle
 %
 \begin{abstract}
-Causal discovery methods increasingly rely on background knowledge to compensate for the fact that 
-observational data alone cannot, in general, identify a unique causal structure. Large language models (LLMs) 
-are progressively used as a convenient source of such background knowledge, proposing causal edges, priors, or 
-full graphs from variable names and textual descriptions. This growing practice presupposes that LLMs possess 
-causal competence rather than sophisticated pattern completion, an assumption that remains empirically and theoretically underexamined. We present a preliminary, proof-of-concept framework for diagnosing whether LLM causal judgments reflect genuine causal reasoning or associative mimicry. The framework integrates Judea Pearl's Ladder of Causation, which distinguishes associational (L1), interventional (L2), and counterfactual (L3) reasoning, with Robert Rosen's modeling relation, which requires that a legitimate model preserve the structural linkages of the natural system it represents. We derive from this integration a falsifiable prediction: if LLMs operate predominantly at L1, their failures on causal benchmarks should concentrate structurally at L2 and L3 rather than being uniformly distributed. We describe an evaluation protocol, built on the CLadder benchmark, that queries LLMs across causal levels and visualizes failure clustering as a directed acyclic graph (DAG) of failure co-occurrence. We report on the current, pre-empirical stage of this work and discuss its relevance for practitioners who use LLMs to elicit causal priors in hybrid causal discovery pipelines.
+Observational data alone does not, in general, identify a unique causal structure, so causal discovery relies on interventions, distributional assumptions, or background knowledge. Large language models (LLMs) are increasingly used as a source of such background knowledge, proposing edges, priors, or whole graphs from variable names. This practice presupposes that an LLM's causal judgments track causal structure rather than the plausibility of the words that name the variables. Drawing on Pearl's ladder of causation and on Rosen's distinction between reactive and anticipatory systems, as developed by Astorga and Letelier, we predicted that a system that compresses the statistics of text, without a model coupled to the system it describes, lets the plausibility of the words override the structure it is given. We tested this on 1,000 matched pairs of CLadder questions that state the same graph and probabilities and differ only in whether the variable names are commonsensical or anti-commonsensical, plus 1,000 items with nonsensical names, reading each model's probability of answering ``Yes''. Four light open-weight models (1.5--7.6B parameters) showed no plausibility penalty: no model was less accurate on anti-commonsensical items, and shifts in $P(\text{Yes})$ were small and in inconsistent directions. The result held when the models reasoned step by step first, which improved accuracy only for the largest model (0.57 to 0.64). Instead, the models barely used the given structure: accuracy stayed near chance, errors were nearly independent across query types, and reasoning traces often invented data. We discuss what this implies for LLM-elicited priors in hybrid causal discovery pipelines.
 
-\keywords{Causal discovery \and Large language models \and Causal reasoning \and Pearl's causal hierarchy \and Benchmark evaluation \and CLadder \and Rosen's modeling relation}
+\keywords{Causal discovery \and Large language models \and Causal reasoning \and Pearl's causal hierarchy \and CLadder \and Commonsense priors \and Anticipatory systems}
 \end{abstract}
 %
-\section{Introduction and Motivation}
+\section{Introduction}
+\label{sec:intro}
 
+Observational data alone does not, in general, identify a unique causal structure. Distinct directed acyclic graphs (DAGs) can be Markov equivalent and therefore indistinguishable from the distribution they generate \cite{verma1990equivalence,spirtes2000causation,glymour2019review}. Causal discovery methods reduce this ambiguity in several ways: by using interventional data or temporal order, by assuming properties of the data-generating distribution, as LiNGAM \cite{shimizu2006linear} and FASK \cite{sanchez2019estimating} do by exploiting non-Gaussianity, or by adding background knowledge that forbids or requires particular edges \cite{spirtes2016causal}. Background knowledge has traditionally come from domain experts. Recently, LLMs have been proposed as a scalable substitute, they are queried for pairwise orientations, edge priors, or full graphs from variable names and textual metadata, and their answers are passed to discovery or estimation pipelines \cite{long2023can,kiciman2023causal,zhang2023understanding,verma2025causal}.
 
-Observational data alone does not, in general, identify a unique causal 
-structure. Distinct DAGs can be Markov equivalent and thus indistinguishable 
-from the observed distribution \cite{spirtes2000causation,glymour2019review,verma1990equivalence}. Discovery algorithms address this non-identifiability 
-with interventions, temporal information, or background knowledge that orients
-edges and prunes the equivalence class \cite{spirtes2016causal}. Such 
-background knowledge has traditionally come from human domain experts; 
-recently, LLMs have been proposed as a scalable substitute, queried for 
-pairwise orientation, edge priors, or full causal graphs from variable names 
-and textual metadata, with their outputs fed directly into discovery pipelines 
-\cite{long2023can,kiciman2023causal,verma2025causal,butkus2025causal}. This 
-practice silently presupposes that LLMs possess causal competence comparable to 
-a domain expert. Though some report encouraging 
-benchmark performance \cite{kiciman2023causal}, while others argue that
-apparent competence is explainable by surface-level statistical association
-rather than genuine causal inference \cite{Zecevic2023CausalPL,willig2022can,li2023counterfactual,chen2024clear,hobbhahn2022investigating}. Rather than 
-resolve this dispute empirically, we contribute a theoretically motivated 
-diagnostic framework and evaluation protocol aimed at determining \emph{where}, structurally, LLM causal reasoning fails, making the epistemic risk of LLM-assisted causal discovery explicit and testable.
+%need to read shimizu2006linear and sanchez2019estimating deeper 
 
-\begin{editorcomment}
-Comment from editor: In the Introduction, when discussing ways to address non-identifiability, the authors forgot to mention non-Gaussian distributions exploited by approaches such as FASK or ICA-based ones like LiNGAM.
-\end{editorcomment}
+This use of LLMs assumes that their causal judgments are informative about causal structure. The evidence is mixed. Kıcıman et al.\ report high accuracy on pairwise orientation and counterfactual tasks \cite{kiciman2023causal}, while others argue that such success reflects causal facts that are stated in the training text and recited back, rather than causal inference \cite{willig2022can,Zecevic2023CausalPL}, and that performance degrades when surface form and content are dissociated \cite{hobbhahn2022investigating,li2023counterfactual,chen2024clear}. The distinction matters for causal discovery because the cases where background knowledge is most needed, such as new variables, new domains, and relations that contradict intuition, are precisely those where a recited causal fact is unavailable or misleading.
 
-\section{Theoretical Framework}
+We ask whether light open-weight LLMs answer causal questions by computing with the structure they are given or by following the plausibility of the words that name the variables. We use CLadder \cite{jin2023cladder}, which states the causal graph and the required probabilities in each prompt and realizes the same formal problem with \textcolor{blue}{commonsensical} (``smoking causes cancer''), \textcolor{green}{anti-commonsensical} (``smoking affects ear shape''), and \textcolor{red}{nonsensical} (``zory affects qixy'') variable names. If the given structure determines the answer, the three variants should be equally hard. If word plausibility dominates, anti-commonsensical items should be harder and should shift the model's probability of answering ``Yes''.
 
-Pearl organizes causal reasoning into three layers of increasing informational demand \cite{pearl2009causality,pearl2018bookOfWhy}: \emph{association} (L1), regularities of $P(y \mid x)$; \emph{intervention} (L2), the effect of actively setting a variable, $P(y \mid do(x))$, which requires knowledge beyond any observational distribution; and \emph{counterfactual} (L3), reasoning about a specific unit under a hypothetical alternative, $P(y_x \mid x', y')$, which presupposes a fully specified structural causal model. No amount of L1 information determines L2 or L3 quantities without additional structural assumptions \cite{pearl2018theoretical}: a system could \emph{appear} causally competent while operating strictly at L1, reproducing correct associational answers while lacking the structural information L2/L3 queries require.
-
-Independently, Rosen's theory of anticipatory systems locates causality not in a primitive property of events but in the \emph{linkages} between the observable qualities of a natural system, expressed as its laws of state change \cite{rosen2012anticipatory}. A model is causally legitimate only insofar as a \emph{modeling relation} holds: a structure-preserving correspondence between inferential entailment in the formal system and causal entailment in the natural system it represents. A model that reproduces surface observables without preserving this correspondence is not a causal model of the system, regardless of predictive accuracy.
-
-Together, the frameworks conform a theoretical foundation for diagnosing the limitations of LLM causal reasoning. Pearl's hierarchy specifies \emph{what} information a causal system must encode beyond association; Rosen's modeling relation specifies \emph{why} a system that merely mimics correct L1 answers cannot be expected to satisfy L2/L3 queries reliably, since doing so is not underwritten by any structural correspondence with the system it describes. This yields the testable prediction organizing our protocol: \emph{if an LLM's causal competence is L1-bound, its errors on a stratified causal benchmark should be structurally concentrated at L2 and L3, not uniformly distributed across levels and subtypes.} Uniform errors would instead suggest generic task difficulty, weakening the associative-mimicry account.
-
-\begin{editorcomment}
-Comment from editor: I am not familiar with Rosen’s framework, but the way it is described in the second paragraph of part 2 seems to be related to the concepts of Markov and Faithfulness assumptions for causal graphical models. Do the authors agree with this? If so, maybe those assumptions also can provide theoretical foundations to the approach suggested here.
-\end{editorcomment}
-
-\begin{editorcomment}
-Comment from editor: I do not see, apart from a seemingly vague aspect of Rosen’s framework relating models and nature, what are the authors leveraging from this framework for their own approach. Can your framework work without Rosen’s? I am confused about the role of Rosen’s framework in this project.  
-\end{editorcomment}
-
-How to connect the causal relations of Rosen as a theorical statement to frame why LLMs are not able to reason causally.
-
-
-\section{Evaluation Protocol and Proof of Concept}
-
-We operationalize this criterion using CLadder \cite{jin2023cladder}, roughly 10,000 items generated from causal graphs paired with associational, interventional, and counterfactual queries, each with a ground-truth answer from a symbolic oracle. Unlike naturalistic-text benchmarks, CLadder's ground truth is tied directly to an explicit graph and query type, letting failures be attributed to a specific hierarchy level and graph topology rather than to question ambiguity.
-
-The planned pipeline: (i) sample a stratified subset of CLadder across levels (L1/L2/L3) and subtypes; (ii) submit each item to one or more LLMs via API under a fixed prompting protocol; (iii) score responses against the oracle and log level, subtype, and graph topology; (iv) aggregate failures into a directed graph, built with \texttt{networkx}, whose nodes represent (level, subtype, topology) strata, used to visualize whether errors cluster at L2/L3 or spread diffusely. This failure DAG exposes the \emph{shape} of the model's error surface rather than recovering any object-level causal structure.
-
-
-
-\begin{editorcomment}
-Comment from editor:  - In Section 3, what do the authors refer to by “subtypes” and “graph topology”.
-\end{editorcomment}
-\begin{editorcomment}
-Comment from editor: model’s error surface
-\end{editorcomment}
-
-This are parameters that are used to generate the queries, and they are used to analyze the results. The subtypes are the different types of queries that can be generated from a causal graph, and the graph topology is the structure of the causal graph itself.
-
-
-This paper reports work at the design and proof-of-concept stage: the theoretical integration, sampling design, and failure-DAG pipeline are specified, while the API-querying and full-scale empirical run are in progress as part of an ongoing undergraduate thesis at Facultad de Ciencias, UNAM. We refrain from reporting preliminary numerical results to avoid presenting underpowered figures; the contribution at this stage is the framework and protocol, offered for discussion ahead of the empirical phase.
-
-\section{Relevance to Causal Discovery and Conclusion}
-
-This work bears directly on the growing practice of using LLMs as sources of expert-like background knowledge in hybrid causal discovery pipelines \cite{long2023can,verma2025causal,butkus2025causal,zhang2023understanding}. If most of an LLM’s apparent causal ability is just associational, then priors extracted from it may work well for tasks that mainly reflect how often concepts co-occur in its training data; but should not be trusted, without separate, external confirmation validation, for orienting edges or resolving Markov-equivalence classes, tasks that are intrinsically interventional or counterfactual. Framing the diagnosis in terms of Pearl's hierarchy yields a criterion portable across models and benchmarks, and the failure-DAG visualization offers a reusable auditing tool for characterizing \emph{where} a model's causal competence breaks down before it is used as a knowledge source. Future work will complete the empirical run across multiple LLM families, report results by level and subtype, and examine whether failure DAGs generalize across models, informing guidance for the use of LLM-elicited priors in causal discovery.
-
-\begin{editorcomment}
-Comment from editor: strongly suggest including a figure with a toy example of a “failure DAG” (step iv of the planned pipeline). It is hard to visualize how one of these graphs would look like.
-\end{editorcomment}
-
-
-\begin{editorcomment}
-Comment from editor: As this is a proof of concept and the project is in an early stage, please discuss more thoroughly the limitations and challenges that you are already confronting, or you expect to confront, and if possible how they could be addressed
-\end{editorcomment}
-
+Our contributions are: (i) a theoretical account, combining Pearl's ladder of causation \cite{pearl2009causality,pearl2018theoretical} with Rosen's theory of anticipatory systems \cite{rosen2012anticipatory} as developed by Astorga and Letelier \cite{astorga2026anticipation}, of why an LLM should be expected to let word plausibility override given structure; (ii) a falsifiable prediction, tested on matched questions that differ only in the variable names, recording each model's probability of answering ``Yes'' rather than only its final answer; (iii) evidence that four light open-weight models show no plausibility effect, with or without step-by-step reasoning, and fail instead to use the given structure; and (iv) a discussion of what this implies for LLM-elicited priors in causal discovery.
 
 \section{Background}
+\label{sec:background}
+
+\subsection{Breaking Markov equivalence}
+\label{sec:mec}
+
+Constraint methods, such as the PC algorithm and Fast Causal Inference (FCI) \cite{spirtes2000causation}, recover the Markov equivalence class of the data-generating graph from conditional independence tests, relying on the causal Markov and faithfulness conditions \cite{glymour2019review}. The class can contain many DAGs that disagree on edge orientation, and the observational distribution cannot decide between them. Four families of additional information can reduce it. \emph{Interventions} change the distribution in a way that depends on the direction of the edges. \emph{Temporal order} rules out effects that precede their causes. \emph{Distributional assumptions} make the full DAG identifiable: LiNGAM shows that when the relations are linear, there are no unobserved confounders, and the disturbances are non-Gaussian, independent component analysis recovers the complete causal order without any prior ordering of the variables \cite{shimizu2006linear}; FASK combines a fast adjacency search with orientation rules based on the skewness of non-Gaussian signals and can recover feedback, including two-cycles, in fMRI time series \cite{sanchez2019estimating}. \emph{Background knowledge} fixes or forbids particular edges \cite{spirtes2016causal,peters2017elements}.
+
+The first three families (\emph{interventions, temporal order, distributional assumptions}) rest on explicit, testable assumptions about how the data were produced. Background knowledge rests on the reliability of its source. When the source is an LLM, the question is what that reliability is grounded in.
+
+\subsection{LLMs as a source of background knowledge}
+\label{sec:llm-bk}
+
+Long et al.\ used LLMs to score candidate edges in medical causal graphs and found the scores useful but brittle to the choice of probing words, context, and prompt \cite{long2023can}. Kıcıman et al.\ reported that GPT-3.5 and GPT-4 reach 97\% accuracy on a pairwise causal discovery benchmark, operating only on variable names and metadata, and noted unpredictable failure modes \cite{kiciman2023causal}. Zhang et al.\ argued that current LLMs can answer causal questions that draw on existing domain knowledge but not those that require discovering new knowledge \cite{zhang2023understanding}. Verma et al.\ proposed an LLM-based agent that selects estimands and statistical methods for applied causal inference \cite{verma2025causal}. In these pipelines the LLM takes the role of the domain expert; its outputs are rarely validated against interventional evidence.
+
+\begin{figure}[t]
+  \centering
+  \input{fig_design}
+  \caption{Design. (a)--(b) A matched pair: the same CLadder item with one
+  variable renamed, so the graph, numbers and answer are identical.
+  (c) Nonsensical items use invented names and their own parameters.
+  In the direct condition the model answers in one forward pass and
+  P(Yes) is read from the logits of the first answer token. In the
+  exploratory CausalCoT condition the model first reasons, then answers
+  in a second turn, read the same way.}
+  \label{fig:design}
+\end{figure}
+
+\subsection{Evaluating causal reasoning in LLMs}
+\label{sec:eval}
+
+Evaluations differ in what they vary. Willig et al.\ and Zečević et al.\ introduce the \emph{meta structural causal model}, whose variables encode causal facts about other models, and conjecture that when LLMs succeed at causal questions they are reproducing correlations between such facts in their training text; they call such systems ``causal parrots'' \cite{willig2022can,Zecevic2023CausalPL}. Hobbhahn et al.\ keep the meaning of a prompt fixed while changing its presentation and find that LLMs perform worse when form and content differ \cite{hobbhahn2022investigating}. Li et al.\ use counterfactual premises that contradict world knowledge (``if cats were vegetarians'') to separate the use of the hypothetical premise from the use of real-world knowledge and associative cues \cite{li2023counterfactual}. Chen et al.\ test whether models understand causal graphs themselves across twenty graph-based tasks and find only a preliminary understanding \cite{chen2024clear}.
+
+CLadder \cite{jin2023cladder} is closest to our setting. Its questions are generated from an explicit graph and query type, and a symbolic causal inference engine provides the ground truth. Jin et al.\ built the anti-commonsensical and nonsensical variants to control for memorization. In their main results, GPT-4 was 1.8 points less accurate on anti-commonsensical than on commonsensical items, and their CausalCoT prompting raised anti-commonsensical accuracy by 9.65 points; the smaller open models they tested, LLaMa and Alpaca (6.7B), were near chance overall \cite{jin2023cladder}. Existing evidence therefore shows at most a small plausibility gap in a large model and gives no information about current light open-weight models or about the probabilities behind the answers. A contrasting result is that of Butkus and Kriegeskorte, who show that a transformer trained by next-token prediction on data generated from linear Gaussian structural causal models, including interventional data, learns to answer counterfactual queries and carries a decodable internal model \cite{butkus2025causal}. We return to this result in Sect.~\ref{sec:discussion}.
+
+\section{Theoretical Framework}
+\label{sec:theory}
+
+\subsection{Seeing, doing, and imagining}
+\label{sec:ladder}
+
+Pearl organizes causal reasoning into three rungs, which correspond to three cognitive abilities: seeing, doing, and imagining \cite{pearl2009causality,pearl2018bookOfWhy}. \emph{Association} (L1) concerns regularities in observation, $P(y \mid x)$: what does a symptom tell me about a disease? \emph{Intervention} (L2) concerns the effect of setting a variable, $P(y \mid do(x))$: what happens to $Y$ if I make $X$ happen? \emph{Counterfactuals} (L3) concern a specific unit under an alternative that did not occur, $P(y_x \mid x', y')$: would my migraine have gone away had I taken an aspirin? No amount of L1 information determines L2 or L3 quantities without further structural assumptions \cite{pearl2018theoretical}. Pearl argues that systems fitted to large collections of observations, like a statistician fitting a curve to a set of points, remain on the first rung, and therefore cannot adapt to circumstances outside their data \cite{pearl2018theoretical,pearl2018bookOfWhy}.
+
+Pearl's argument, however, concerns systems whose data are observations of the variables in question. The training data of an LLM are not observations of smoking and cancer; they are text, and text contains descriptions of interventions and statements of causal facts \cite{Zecevic2023CausalPL}. The ladder alone therefore does not settle whether an LLM can answer L2 and L3 questions. What it needs in addition is an account of what distinguishes a system that has a causal model of something from a system that summarizes correlations in what others have written about it. We take this account from Rosen.
+
+\subsection{Reactive and anticipatory systems}
+\label{sec:rosen}
+
+Rosen distinguishes \emph{reactive} systems, whose future states are computed from present and past states, from \emph{anticipatory} systems, which contain a predictive model of themselves or their environment and change state according to that model's predictions \cite{rosen2012anticipatory}. A model in Rosen's sense stands in a \emph{modeling relation} to a \textbf{natural system}: inferential entailment in the formal system corresponds, through encoding and decoding, to causal entailment in the natural system it represents. A formal system that reproduces the observables of a natural system without this correspondence is not a model of it, whatever its predictive accuracy.
+
+\begin{figure}[t]
+  \centering
+  \input{fig_rosen}
+  \caption{(a) Rosen's modeling relation, adapted from \cite[Fig.~2.1]{rosen2012anticipatory}:
+  $F$ is a model of $N$ when inference in $F$, decoded, agrees with causal
+  entailment in $N$. (b) Our reading, following Astorga and Letelier
+  \cite{astorga2026anticipation}: an LLM is trained on text by observers
+  describing their own \emph{Umwelten}, and no encoding or decoding couples
+  its inferences to $N$.}
+  \label{fig:rosen}
+\end{figure}
 
 
-Pearl plantea como partida tres habilidades distintas de la cognición: ver, hacer e imaginar
-o hipotetizar/anticipar(Rosen). \cite{pearl2018bookOfWhy}
+Astorga and Letelier connect Rosen's anticipatory systems to Maturana's structural coupling and describe three levels at which an observer can describe an organism \cite{astorga2026anticipation}. At Level~0, the organism associates signals with actions and the objects that produce the signals are assumed to exist beforehand. At Level~1, these associations are described by a conditional probability matrix $P(Y \mid s_\alpha)$ over signals and actions, which they characterize as ``the observer's statistical description of the effective behavior'' of the organism. At Level~2, the objects are no longer given: they are built and maintained through the organism's recurrent $<perception,action>$ interaction with its medium, and constitute its \emph{Umwelt}. Level~1 is the analogue of Pearl's first rung: a table of conditional regularities with no account of where the regularities come from.
+
+On this basis Astorga and Letelier classify current AI systems, including LLMs, as reactive. They ``contain statistical compressions of training data'', a conditional distribution over next tokens is ``a summary of past correlations, not a dynamical system with its own internal entailment running ahead of reality'', and an LLM's Umwelt ``is not self-constructed but derived from others' Umwelten'' \cite{astorga2026anticipation}. They separate two claims. The \emph{architectural} claim is that current models lack internal dynamics coupled to the environment; this is contingent and could in principle be engineered. The \emph{constitutive} claim, which they endorse, is that anticipation requires self-fabrication, so no purely computational system can meet it. Korbak's computational enactivism offers a contrasting view, under the free energy principle, cognitive systems encode generative models of their niches and update them through both $<perception,action>$, and this process is at once computational and enactive \cite{korbak2021computational}. The disagreement matters for what an experiment can show. We adopt Astorga and Letelier's position as our theoretical frame, but a behavioural benchmark can bear only on the architectural claim, it can show that a model's answers follow the statistics of its training text rather than the structure it is given, not that no computational system could do otherwise.
+
+\subsection{Rosen's modeling relation and the Markov and faithfulness conditions}
+\label{sec:markov}
+
+The causal Markov condition states that each variable is independent of its non-descendants given its parents in the causal graph; faithfulness states that every conditional independence in the distribution is entailed by the graph \cite{spirtes2000causation}. Together they license the inference from observed dependencies to graph structure, up to Markov equivalence. They resemble Rosen's modeling relation in that both concern a structure-preserving correspondence between a formal object and a natural system. They differ in what they connect. Markov and faithfulness relate a graph to a probability distribution, and both are formal objects; whether the graph is the causal structure of the natural system is a further assumption, justified by the interventional meaning of the graph. The modeling relation is the requirement that this further assumption hold: that inference in the model track causation in the system.
+
+The distinction clarifies the position of an LLM. Even if the Markov and faithfulness conditions hold for the system described in a CLadder question, the model's output distribution is not a distribution over that system's variables. It is a distribution over text, produced by people describing their own Umwelten. Dependencies in that distribution reflect how causal relations are talked about, which is the meta-model of Zečević et al.\ \cite{Zecevic2023CausalPL}, and there is no Markov or faithfulness link between them and the structure given in the prompt. Pearl's hierarchy tells us that L2 and L3 answers require structure; the Markov and faithfulness conditions tell us when statistics can reveal structure; Rosen's modeling relation, in Astorga and Letelier's reading, tells us why a statistical compression of text does not supply it. Without Rosen, the framework would still predict failures, but it would not explain why the failures should follow word plausibility, which is the prediction we test.
+
+% EDITOR: relation between Rosen's framework and Markov/faithfulness -> addressed in Sect. 3.3.
+% EDITOR: "Can your framework work without Rosen's?" -> addressed at the end of Sects. 3.1 and 3.3.
+
+\subsection{From theory to a testable prediction}
+\label{sec:predictions}
+
+If a model answers by computing with the structure in the prompt, the words used to name the variables should not matter. If it answers from a statistical compression of text, the plausibility of those words should influence the answer even when the given graph and probabilities determine it. Nonsensical names carry no plausibility either way. Anti-commonsensical names, such as an effect of ``playing card games'' on ``exam score'', carry a prior against the stated relation. We therefore state, before running the main experiment:
+
 \begin{itemize}
-    \item \textbf{Ver - Imitar} Nos ayuda a percibir regularidades las observaciones. Estas
-Rosen las pondría como la identificacion de perceptos. 
-    \item \textbf{Hacer - Planear} Predecir los efectos provocados por cierta perturbacion en el ambiente
-y tomar una decision para obtener el resultado deseado. Esto incluye la habilidad de
-tomar herramientas intencionalmente para lograr el objetivo. 
-    \item \textbf{Imaginar - Hipotetizar} Cuando tenemos una teoría de porque funciona una herramienta o cuando no, 
-podemos hipotetizar y mejorar estas herramientas para futuros escenarios. 
+\item[\textbf{H1}] Accuracy on nonsensical items is close to accuracy on commonsensical items, and accuracy on anti-commonsensical items is lower than both.
+\item[\textbf{H1b}] For query types that ask whether $X$ affects $Y$, the probability a model assigns to ``Yes'' is lower on anti-commonsensical items than on commonsensical items with the same ground-truth answer.
+\item[\textbf{H2}] (secondary) Accuracy on L2 and L3 questions is lower than on L1 questions.
 \end{itemize}
 
-Si una de las intenciones de Turing era intentar definir un agente coginitvo en cuanto a
-las preguntas que puede responder. La intencion de Pearl aqui plantea, en cada uno de los 
-niveles, distintas dificultades. Para Pearl un sistema que realmente presente cognicion 
-deberia ser posible de reproducir estos tres tipos de inferencias causales. 
+H1 and H1b are the predictions that the theory makes specifically. \textbf{We take the absence of both an accuracy gap and a shift in $P(\text{Yes})$ between commonsensical and anti-commonsensical items as evidence against our account} for the models tested. Uniformly low accuracy across all variants would not support the account, since it is equally consistent with a model that simply cannot perform the computation.
 
-Los tres puntos anteriores representan entonces, la intuicion por detras de la 
-formulacion matematica, de dichas relaciones. 
+\section{Method}
+\label{sec:method}
 
-\begin{itemize}
-    \item L1. \textbf{Asociativo}. ¿Que pasa si veo ? ¿Como cambiaria mi creencia en Y viendo X? En ejemplos 
-    de la vida real sería que me dice un sintoma acerca de una enfermedad ? que me dice el resultado de una encuesta para predecir 
-    el resultado final de las elecciones ? 
-    \item L2. \textbf{Intervencion}. Que pasaria si hago \dots ? Como seria Y si hago X ? Como puedo hacer que pasae Y ?
-    \item L3. \textbf{Contrafactual}. ¿Si tomo una aspirina, se me quitaria mi migraña ?¿Que pasa si prohibimos los cigarros?
-\end{itemize}
+\subsection{The CLadder benchmark}
+\label{sec:cladder}
 
-¿Que es lo que puede hacer un razonador causal?¿Que puede computar un organismo con un modelo causal, 
-a falta de el, que le permite predecir? 
+CLadder \cite{jin2023cladder} contains yes/no questions generated from a causal graph, a query type, and a story. Each item consists of a question $q_i$, a binary answer $a_i \in \{\text{Yes},\text{No}\}$, and an explanation $e_i$. The \emph{graph topology} is the structure of the causal graph over three or four binary variables; CLadder uses ten topologies taken from the causal inference literature: chain, fork, collision, confounding, mediation, diamond, diamondcut, arrowhead, instrumental variable, and frontdoor. The \emph{query type} is the causal quantity asked about: marginal and conditional probabilities and explaining away at L1; the average treatment effect and the choice of adjustment set at L2; and counterfactual probabilities, the average treatment effect on the treated, and natural direct and indirect effects at L3. The prompt states the graph in words and gives the information needed to identify the answer, which a symbolic causal inference engine computes by do-calculus and counterfactual inference. A question can therefore always be answered from the prompt alone, provided the correct reasoning is applied. 
 
-Aqui Rosen diferia, en cuanto a que el proceso de inferencia de un organismo, 
-no de depende solo de su estructura causal sino tambien viene desde una idea que 
-engloba el completo funcionamiento del organismo, definiendo la coginicion y agencia del 
-organismo no solo en la estructura causal del fenomeno que se esta tratando de predecir. 
+The \emph{story} names the variables: textbook examples (\textcolor{blue}{commonsensical}), an unrelated effect or treatment such as ``ear shape'' or ``plays card games'' (\textcolor{green}{anti-commonsensical}), or invented words such as ``zory'' (\textcolor{red}{nonsensical}) \cite{jin2023cladder}.
 
-Uno de los objetivos principales de la version fuerte de IA, es reproducir la inteligencia humana. En lugar
-de tener una inteligencia genuina, nos encontramos con habilidades impresionantes. La diferencia recae en la falta 
-de un modelo de la realidad. 
+% EDITOR: what do "subtypes" and "graph topology" refer to -> defined in Sect. 4.1.
 
-Muchos de los sistamas de IA se basan especialmente en la asociacion. Toman una colección gigante de observaciones para 
-encajar una funcion de la misma manera que un estadista podria querer encajar una linea para pasar por una 
-coleccion de puntos. Esto pone una barrera, para que los sistemas puedan ser capaces de reaccionar a circunstancias fuera del 
-dataset. Como en los coches de manejo automatico, ¿que pasa si nos encontramos por accidente una vaca en la carretera, un bache
-o un borracho ?¿Como podemos hacer un deduccion generalizada? Esta falta de flexibilidad y adaptacion es ineblitable 
-en la primerca jerarquia causal. 
+\subsection{Sampling and matched pairs}
+\label{sec:sampling}
 
-\begin{editorcomment}
-Comment from editor: The authors cited other papers exploring the relationship between LLMs and causal outputs, it would be relevant to include more detail of how these papers approached the questions pursued by the authors in this project.
-\end{editorcomment}
+The commonsensical and anti-commonsensical files of CLadder v1 contain the same formal questions with one variable renamed: the same story, graph, query type, given probabilities, and answer. We matched them one to one on these fields, obtaining 9,758 unambiguous pairs; for example, ``Will smoking increase the chance of lung cancer?'' is paired with ``Will listening to jazz increase the chance of lung cancer?'' under identical probabilities. Nonsensical items use different parameters and are compared as a group. We drew 1,000 pairs (commonsensical and anti-commonsensical) and 1,000 nonsensical items, giving 3,000 items that every model answers. Comparisons between commonsensical and anti-commonsensical items are therefore paired: any difference is attributable to the names alone.
 
+\subsection{Models}
+\label{sec:models}
 
+We tested four smaller AI models: SmolLM2-1.7B-Instruct, Qwen2.5-1.5B-Instruct, Phi-3.5-mini-instruct (3.8B), and Qwen2.5-7B-Instruct. We ran SmolLM2 and Qwen2.5-1.5B using full precision (32-bit) because they fit on the GPU, which made their 'Yes' probabilities consistent. Phi-3.5 and Qwen2.5-7B were too large, so we used a special method (4-bit quantization and 16-bit computation) to load them. This means their 'Yes' probabilities might vary slightly depending on how items are grouped. All models were tested with the same 3,000 items, grouped in batches of 8 for direct questions and 32 for CausalCoT questions. We recorded all results with details about each model's settings.
 
-\section{CLADDER}
+\subsection{Prompting and answer probabilities}
+\label{sec:prompting}
 
-Causal Inference Engine. 
+In the \emph{direct} condition, each item is a single user turn with four lines: the CLadder background, which states the causal graph; the given information; the question; and ``Answer with Yes or No only.'' The model's chat template is applied and no text is generated. We run one forward pass and read the logits of the answer tokens at the first generated position, summing over case and leading-space forms of each word:
+\[
+P(\text{Yes}) = \frac{\sum_{t \in \mathcal{Y}} e^{\ell_t}}{\sum_{t \in \mathcal{Y}} e^{\ell_t} + \sum_{t \in \mathcal{N}} e^{\ell_t}},
+\]
+where $\mathcal{Y}$ and $\mathcal{N}$ are the single-token forms of ``Yes'' and ``No''. The answer is constrained to Yes or No: the prediction is ``Yes'' when $P(\text{Yes}) > 0.5$, and $P(\text{Yes})$ is kept as a graded measure of the model's preference. This removes answer parsing, and the probability mass on the two answers (median $\geq 0.97$ for every model and condition) confirms that the models were answering the question.
 
-Data sets are in the form of $D := \{q_i, a_i, e_i \}$, where $q_i$ is a query, $a_i$ is the answer, and $e_i$ is the explanation. The experiment consist in translating the query $q_i$ into a prompt $p_i$ and then sending it to the LLM, $f : q_i \rightarrow p_i$. All the statements contain a Formal part, and a natural language part. 
+\subsection{Exploratory CausalCoT condition}
+\label{sec:cot}
 
-The LLM will return an answer $a'_i$ and an explanation $e'_i$. The answer $a'_i$ is compared with the ground truth answer $a_i$ to determine if the LLM answered correctly or not. The explanation $e'_i$ is compared with the ground truth explanation $e_i$ to determine if the LLM explained correctly or not. The results are stored in a data frame for further analysis.
+After the direct runs, we added a condition that asks the model to reason first. It uses a balanced subset of 150 pairs and 150 nonsensical items per model. % UPDATE-QWEN7B: Qwen2.5-7B extended to N pairs
+In a first turn the model receives the same background, information, and question followed by the six CausalCoT steps of Jin et al.\ \cite{jin2023cladder}: extract the graph, identify the query type, formalize it, gather the data, derive the estimand, and compute it. It generates its reasoning greedily, up to 1,024 new tokens. The reasoning is kept in the conversation, a second turn asks ``Based on all the reasoning above, answer the initial question with just Yes or No.'', and $P(\text{Yes})$ is read at the first answer token exactly as in the direct condition. As output the model produces a reasoning trace and an answer, but the trace is not evaluated. The CausalCoT condition is exploratory: it was added after the direct runs, the sample is smaller, and the runs are not repeated. To evaluate the final answer, we put a limit of 1,024 tokens on the reasoning trace and a limit of 128 tokens on the answer, which was sufficient for all items.
 
-All the queries contain statements in the three rungs, and are constructued with binary variables. Each query contain 
-three or four nodes to mitigate the lack of mathmatical and large processing mistakes LLMs can make. 
+\subsection{Analysis}
+\label{sec:analysis}
 
-The Causal Cot promt divides the queries in this steps, inspired by 
-making a CI engine plugin to aument the LLMs capabilities. The workflow consist in the following steps:
+We report accuracy with 95\% Wilson intervals. The H1 gap (commonsensical minus anti-commonsensical accuracy) is computed on matched pairs, with a percentile bootstrap interval (10,000 resamples) and an exact McNemar test; the gap to nonsensical items uses Newcombe's interval for independent proportions. H1b is the paired difference in mean $P(\text{Yes})$ between commonsensical and anti-commonsensical items on the query types that ask whether $X$ affects $Y$ (conditional probability, average treatment effect and its version on the treated, natural direct and indirect effects, and counterfactuals), computed separately for items whose correct answer is Yes and No. H2 compares accuracy across rungs. Direct and CausalCoT accuracy are compared on the same items with McNemar's test.
 
-\begin{itemize}
-    \item causal graph extration
-    \item correct query type interpretation 
-    \item symbolic formalization of the query 
-    \item semantic parsing to compile the available data
-    \item stimand derivation 
-    \item arithmetic calculation 
-\end{itemize}
+Accuracy thresholds $P(\text{Yes})$ at 0.5 and therefore mixes two things: whether the model's preference follows the correct answer, and where its overall bias lies. We separate them with two further measures. \emph{Discrimination} is the area under the ROC curve (AUROC) of $P(\text{Yes})$ against the correct answer: 0.5 means that the probability carries no information about the answer, whatever the bias. \emph{Name sensitivity} is the share of matched pairs whose thresholded answer flips when the variable is renamed; unlike the gap, it counts changes in either direction. To read null results, we treat differences within $\pm 0.04$ (four accuracy points, or 0.04 in mean $P(\text{Yes})$) as negligible. This bound was fixed after the direct runs, from the 1.8-point gap Jin et al.\ report for GPT-4 \cite{jin2023cladder}, and we use it descriptively rather than as a formal equivalence test.
 
-As the statements where algorithmically generated, gramatical errors where analyzed using the LanguageTool API, 1.26 grammatical errors per 100 words (98.74\%  accuracy).
+% EDITOR: toy example of a "failure DAG" -> replaced by the real failure graph (Fig. 1).
+% EDITOR: "model's error surface" (unclear term) -> replaced by the defined failure graph.
 
-Other research effords have focus in checking causality as knowladge, causality as language comprehension, 
-and causality as reasioning. 
+\section{Results}
+\label{sec:results}
 
-Other examples of commonsense causality includes 
-\begin{itemize}
-    \item cause and effect of an agent action 
-    \item motivation and emotional reaction in social context 
-    \item correspondance of a set of steps with a high level goal
-    \item development of a story given a different beginning 
-    \item knowladge base for causality 
-    \item infer causation from correlation 
-\end{itemize}
+We report four findings in turn: the variable names do not move the answers in the predicted direction (Sect.~\ref{sec:res-names}); the answers carry little information about the given structure (Sect.~\ref{sec:res-structure}); what little variation there is follows the query type, not the rung or the topology (Sect.~\ref{sec:res-where}); and reasoning first changes the bias more than the accuracy (Sect.~\ref{sec:res-cot}).
 
-Remark the importance of causality in policy, desicion making, epidemiology, economics, fairness, and explicability. 
+\subsection{Variable names do not shift the answers in the predicted direction (H1, H1b)}
+\label{sec:res-names}
 
-\section{Experimental Setup}
+All four models are between 0.50 and 0.60 accurate on every variant (Table~\ref{tab:variants}, Fig.~\ref{fig:acc-variant}). On the 1,000 matched pairs no model is less accurate on anti-commonsensical items (Fig.~\ref{fig:forest}a). The gaps are $+0.002$ (SmolLM2), $+0.014$ (Qwen2.5-1.5B, 95\% CI $-0.013$ to $0.042$), $+0.014$ (Phi-3.5, $-0.014$ to $0.042$), and $-0.025$ (Qwen2.5-7B, $-0.055$ to $0.005$), with no McNemar test below $p = 0.12$. Every upper bound lies at or below $0.042$, so a plausibility penalty larger than about four points is excluded for each model; Qwen2.5-7B's interval extends further on the other side, towards higher accuracy on anti-commonsensical items. Commonsensical and nonsensical accuracy do not differ either (largest gap $+0.034$, Phi-3.5, 95\% CI $-0.009$ to $0.077$).
 
-Using Gemma4, Qwen3.6-35B-A3B, Nemotron 3 Super 120B-A12B, Mistral Medium 3.5 128B, DeepSeek-V4-Flash. Open source LLMs, and GPT-4. To compare the performance of the LLMs, we will use the CLADDER benchmark, which contains 10,000 queries in the three rungs of Pearl's ladder. The queries are divided into three levels: L1, L2, and L3. Each level contains a set of queries that test the LLM's ability to reason about causality. 
+The paired probabilities show the same result item by item (Fig.~\ref{fig:scatter}). The plausibility account predicts that the points fall below the diagonal. For every model the share below it is between 0.45 and 0.56. For H1b (Fig.~\ref{fig:forest}b), only Phi-3.5 shifts in the predicted direction, assigning about 0.05 less probability to ``Yes'' on anti-commonsensical items (Yes items: 95\% CI $0.004$ to $0.103$; No items: $0.001$ to $0.098$). Both Qwen models shift the other way on Yes items ($-0.044$ and $-0.050$, both intervals excluding zero), and SmolLM2's shifts are below 0.01.
 
-To mitigate data contamination, we will translate the queries into Spanish, and then back into English using a different LLM. This will ensure that the queries are not present in the training data of the LLMs being tested.  
+The names are not irrelevant, however. Renaming one variable flips the answer on 20\% (Qwen2.5-1.5B), 21\% (Phi-3.5), and 24\% (Qwen2.5-7B) of pairs, and the paired probabilities are only moderately correlated (Spearman $\rho = 0.65$--$0.76$). These flips are close to symmetric: in Qwen2.5-7B, 107 pairs are correct only under the commonsensical name and 132 only under the anti-commonsensical one. The names therefore add item-level noise to the answers, but not the directional pull toward plausibility that the account predicts. SmolLM2 flips on fewer than 1\% of pairs, because it answers ``No'' to almost every item.
 
+\begin{table}[!htbp]
+\centering
+\caption{Direct condition: accuracy (95\% Wilson CI) by commonsense alignment on 1,000 items per variant, and mean $P(\text{Yes})$ on commonsensical/anti-commonsensical relational items whose correct answer is ``Yes'' (330 pairs).}
+\label{tab:variants}
+\scriptsize
+\begin{tabular}{lcccc}
+\toprule
+Model & Comm. & Nonsens. & Anti-C. & $\bar P(\text{Yes})$ Comm./Anti-C. \\
+\midrule
+\csname @@input\endcsname tables/variants_rows.tex
+\bottomrule
+\end{tabular}
+\end{table}
 
+\begin{figure}[!htbp]
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+    \includegraphics[width=\linewidth]{./figures/accuracy_by_variant.pdf}
+    \caption{Direct condition, 1,000 items per variant.}
+    \label{fig:acc-variant}
+  \end{subfigure}\hfill
+  \begin{subfigure}[b]{0.49\textwidth}
+    \includegraphics[width=\linewidth]{./figures/accuracy_direct_vs_cot.pdf}
+    \caption{Direct vs.\ CausalCoT, same 450 items per model.}
+    \label{fig:acc-cot}
+  \end{subfigure}
+  \caption{Accuracy with 95\% Wilson intervals. The dashed line marks
+  chance (0.5). No model is less accurate on anti-commonsensical items,
+  and reasoning first improves accuracy significantly only for
+  Qwen2.5-7B-Instruct.}
+  \label{fig:accuracy}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=0.78\textwidth]{./figures/paired_pyes_scatter.pdf}
+  \caption{$P(\text{Yes})$ for the 1,000 matched pairs in the direct condition: the commonsensical item on the $x$-axis and its anti-commonsensical twin, with the same graph, probabilities, and answer, on the $y$-axis (logit scale; values beyond $10^{-6}$ are drawn at the edge). The plausibility account predicts points below the diagonal. Instead, the points scatter symmetrically around it, and the colours, which mark the correct answer, overlap. \emph{Answer flips}: share of pairs whose thresholded answer differs between the two names.}
+  \label{fig:scatter}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=\textwidth]{./figures/forest_effects.pdf}
+  \caption{Commonsensical minus anti-commonsensical effects with 95\% bootstrap intervals, direct (1,000 pairs) and CausalCoT (150 pairs). Positive values are the predicted plausibility penalty. (a) Accuracy gap (H1). (b) Shift in mean $P(\text{Yes})$ on relational items (H1b), separately for items whose correct answer is Yes (filled) and No (open). The shaded band marks $\pm 0.04$.}
+  \label{fig:forest}
+\end{figure}
+
+\subsection{The answers carry little information about the given structure}
+\label{sec:res-structure}
+
+Accuracy near 0.5 could hide a model that ranks the items correctly but sits at the wrong threshold. The distribution of $P(\text{Yes})$ separated by the correct answer rules this out (Fig.~\ref{fig:discrimination}). On all 3,000 direct items, the AUROC is 0.50 for SmolLM2, 0.53 for Qwen2.5-1.5B, 0.61 for Phi-3.5, and 0.62 for Qwen2.5-7B. For the two small models the Yes and No distributions almost coincide. For the two larger ones they differ, but mainly through a mass of confident ``No'' answers that is present for both kinds of item. The models are also strongly biased, in different directions: SmolLM2 answers ``Yes'' to 0.1\% of items, Phi-3.5 to 33\%, Qwen2.5-7B to 48\%, and Qwen2.5-1.5B to 50\%, all on a set with 50\% Yes answers. Accuracy, bias, and discrimination together say that the probabilities follow the given graph and numbers only weakly.
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=\textwidth]{./figures/discrimination_pyes.pdf}
+  \caption{Distribution of $P(\text{Yes})$ for items whose correct answer is No (left halves) and Yes (right halves), on the same 450 items in the direct and CausalCoT conditions; horizontal ticks are medians. AUROC $=0.5$ means that $P(\text{Yes})$ carries no information about the correct answer. For the small models, CausalCoT mainly shifts both distributions upward; for Qwen2.5-7B, it separates them.}
+  \label{fig:discrimination}
+\end{figure}
+
+\subsection{Accuracy follows the query type, not the rung or the topology (H2)}
+\label{sec:res-where}
+
+Accuracy does not decrease with the rung. For every model whose accuracy varies, L1 is the lowest rung; for Qwen2.5-7B it is 0.52, 0.64, and 0.57 at L1--L3. The larger differences are between query types within a rung (Fig.~\ref{fig:heatmap}). The average treatment effect is the only query type that the three informative models answer well across topologies (0.59--0.76 accuracy). The choice of adjustment set and collider bias, also at L2, are below chance. Collision graphs, which contain only L1 questions, adjustment set, and collider bias, are the hardest topology for every model (0.33--0.46).
+
+The low cells are not caused by difficult numbers. They occur because some query types receive the same answer whatever the item says. Phi-3.5 and Qwen2.5-7B answer ``No'' to every collider-bias question, Qwen2.5-7B answers ``No'' to 99\% of adjustment-set questions, and Phi-3.5 answers ``No'' to 99\% of marginal-probability questions, although the correct answer is ``Yes'' on 47--54\% of the items of each of these query types. In these cells the answer is determined by the wording of the question template, not by the graph or the probabilities it states. The failure graphs point the same way: every lift between query types is below 1.3 (largest: from the average treatment effect to the natural indirect effect for Qwen2.5-7B, 1.28), so errors on one query type barely predict errors on another.
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=\textwidth]{./figures/heatmap_query_topology.pdf}
+  \caption{Direct-condition accuracy by query type (rows, grouped by rung) and graph topology (columns). (a) Pooled over Qwen2.5-1.5B, Phi-3.5, and Qwen2.5-7B; (b) Qwen2.5-7B alone. SmolLM2 is omitted because its accuracy in each cell equals the share of ``No'' answers. Bold values have a 95\% Wilson interval that excludes 0.5; blank cells are combinations that CLadder does not generate.}
+  \label{fig:heatmap}
+\end{figure}
+
+\subsection{Reasoning first shifts the bias more than the accuracy (exploratory)}
+\label{sec:res-cot}
+
+Table~\ref{tab:cot} and Fig.~\ref{fig:acc-cot} compare the two conditions on the same 450 items. % UPDATE-QWEN7B: numbers below for Qwen2.5-7B
+Reasoning first raises accuracy significantly only for Qwen2.5-7B, from 0.57 to 0.64 (paired difference $+0.073$, 95\% CI $0.029$ to $0.118$, McNemar $p = 0.002$). The changes for Qwen2.5-1.5B ($+0.047$, $p = 0.16$), Phi-3.5 ($+0.022$, $p = 0.43$), and SmolLM2 ($-0.007$) are not significant. Qwen2.5-7B is also the only model whose discrimination clearly improves (AUROC 0.60 to 0.72 on these items; Fig.~\ref{fig:discrimination}). For the two small models, reasoning mainly moves the whole distribution toward ``Yes'', from 0.50 to 0.78 ``Yes'' for Qwen2.5-1.5B and from 0.00 to 0.63 for SmolLM2, while AUROC stays at 0.49--0.55. Reasoning does not produce a plausibility effect: no paired accuracy gap and no $P(\text{Yes})$ shift differs from zero (Fig.~\ref{fig:forest}, orange). With 150 pairs, however, these intervals are about $\pm 0.08$ wide and cannot exclude effects of that size. After regeneration at 1,024 tokens, 3--8\% of traces per model still reached the limit, at similar rates across variants.
+
+\begin{table}[!htbp]
+\centering
+\caption{Direct and CausalCoT conditions on the same 450 items per model (150 pairs + 150 nonsensical items): accuracy, commonsensical minus anti-commonsensical accuracy on matched pairs (95\% bootstrap CI), and share of CausalCoT traces that reached the 1,024-token limit.} % UPDATE-QWEN7B
+\label{tab:cot}
+\scriptsize
+\begin{tabular}{lccccc}
+\toprule
+Model & Acc.\ direct & Acc.\ CoT & Gap direct & Gap CoT & Trunc. \\
+\midrule
+\csname @@input\endcsname tables/cot_rows.tex
+\bottomrule
+\end{tabular}
+\end{table}
+
+The traces show why. The models often do not use the information they are given. Deterministic counterfactual questions provide no probabilities, only logical relations, yet 81\% of Qwen2.5-1.5B traces and 74\% of SmolLM2 traces on these items state probability values, against 12\% for Phi-3.5 and 9\% for Qwen2.5-7B (43 items each; a text heuristic). Other traces misidentify the query type, for example by treating a choice between two adjustment strategies as an average treatment effect and waiting for probabilities that the question does not contain. The model that invents data least is also the only one that benefits from reasoning.
+
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+\paragraph{The prediction is not supported.} By the criterion stated in Sect.~\ref{sec:predictions}, the absence of both an accuracy gap and a consistent $P(\text{Yes})$ shift counts against the word-plausibility account for these models. With 1,000 matched pairs, the direct condition rules out anti-commonsensical penalties larger than about four points, and the only shift in the predicted direction (Phi-3.5) is offset by shifts in the opposite direction in both Qwen models. The same holds when the models reason first. This agrees with Jin et al., who found only a 1.8-point gap for GPT-4 \cite{jin2023cladder}.
+
+\paragraph{What limits these models.} The names change individual answers but do not pull them toward plausibility, and the models are also largely insensitive to the structure. Accuracy is near chance, $P(\text{Yes})$ barely discriminates the correct answer, several query types receive the same answer whatever the numbers, and the traces invent data and misread the question. The failure is one of grounding, of using the graph and information given in the prompt, rather than of plausibility overriding structure. This is compatible with the reactive-systems frame of Sect.~\ref{sec:rosen}, but it is not the specific mechanism we predicted. Two readings remain open. The prediction may be wrong, or it may require models that have absorbed enough causal statements for plausibility to pull their answers, which the causal parrots account \cite{Zecevic2023CausalPL} and the high pairwise accuracy of larger models \cite{kiciman2023causal} suggest; at 1.5--7B parameters the priors may simply be too weak to matter. Only the larger models can separate these readings. Reasoning helped only Qwen2.5-7B, the model that invents data least: it helps a model that uses the given information, not one that replaces it. Butkus and Kriegeskorte's result \cite{butkus2025causal}, where next-token prediction on data generated by causal models yields causal inference, is consistent with the architectural claim: what these models lack is a training signal coupled to the system they are asked about, not a capacity for prediction.
+
+\paragraph{Implications for LLM-elicited priors.} At this scale, a model's causal judgments are neither misled by plausible names nor informed by the structure it is shown, so its priors are close to uninformative for orienting edges. For larger models the risk we set out to test remains open: priors that follow how relations are described in text would be most misleading in the cases where background knowledge is most needed, when relations are new or counterintuitive. In both cases, causal relationships used in discovery should be grounded in experiments, simulations, or explicit distributional assumptions such as those of LiNGAM and FASK; LLM priors can propose hypotheses to be tested, not replace that grounding.
+
+\paragraph{Limitations.} We tested four small models that are not trained as reasoning models; two ran in 4-bit quantization. Current reasoning models, and their distillations into models of the same size, may behave differently. We used a single prompt wording per condition. CLadder gives the graph and the information in the prompt, so it tests inference from given structure, not the recovery of structure that discovery requires, and its stories are generated from templates. The CausalCoT condition was added after the direct results, uses 150 pairs per model (intervals of about $\pm 0.08$ on the gap), and 3--8\% of its traces were truncated; the Qwen2.5-7B subset was enlarged after the first results. % UPDATE-QWEN7B
+The invented-data rate is a text heuristic. Finally, thresholding $P(\text{Yes})$ at 0.5 mixes answer bias into accuracy, as SmolLM2 shows.
+
+\paragraph{Practical challenges.} A first run of SmolLM2 on all 10,560 items of the CLadder v1 easy file, generating and parsing answers, took 31 hours and lost answers to over-length and unreadable responses; it was near chance (0.47) with 64\% ``yes'' answers. Reading answer probabilities from a single forward pass removed both problems. Half-precision arithmetic made the probabilities depend on batching. We removed this with 32-bit computation for the two smallest models, but the two larger models only fit in 4-bit quantization with 16-bit computation. For the CausalCoT condition, reasoning traces of 512 tokens were often too short, and regenerating only the truncated traces at a higher limit kept the cost manageable.
+
+% EDITOR: discuss limitations and challenges more thoroughly -> Sect. 6 (Limitations; Practical challenges).
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+LLMs are increasingly used as a stand-in for domain experts in causal discovery. From Pearl's ladder of causation and Rosen's distinction between reactive and anticipatory systems, as developed by Astorga and Letelier, we predicted that a system which compresses the statistics of text would let the plausibility of variable names override the causal structure it is given. On matched CLadder questions that differ only in the names, four light open-weight models showed no such effect, with or without step-by-step reasoning. Their failure is different: they barely use the structure and information in the prompt, and reasoning helps only the model that grounds it. For practitioners, the conclusion is the same either way: causal relationships used in discovery should be grounded in experiments, simulations, or explicit assumptions, and LLM priors treated as hypotheses. Future work will test larger and reasoning models, where plausibility effects may appear, and compare these patterns with human commonsense causal reasoning \cite{penn2007causal}.
 
 %
 % ---- Bibliography ----

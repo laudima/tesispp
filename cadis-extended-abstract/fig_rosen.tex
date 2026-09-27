@@ -1,0 +1,60 @@
+% ------------------------------------------------------------------
+% Fig. -- Rosen's modeling relation (a) and where an LLM sits (b).
+% (a) redrawn and adapted from Rosen, Anticipatory Systems, Fig. 2.1.
+% Include with \input{fig_rosen} inside a figure environment. Preamble:
+%   \usepackage{tikz,amsmath}
+%   \usetikzlibrary{arrows.meta,calc}
+% Designed for LNCS \textwidth (12.2 cm); do not rescale.
+% ------------------------------------------------------------------
+\begin{tikzpicture}[
+  font=\scriptsize,
+  >={Stealth[length=1.5mm]},
+  sys/.style={draw, thick, rounded corners=1pt, minimum width=1.9cm,
+              minimum height=1.05cm, align=center},
+  aux/.style={draw, rounded corners=1pt, minimum width=2.0cm, text width=1.9cm,
+              minimum height=1.05cm, align=center, fill=black!4},
+  lab/.style={align=center, inner sep=1pt},
+  note/.style={align=center, font=\tiny, text=black!70},
+  miss/.style={->, dashed, black!50},
+]
+% self-loops (Rosen's entailment arrows)
+\newcommand{\loopW}[1]{\draw[->, thick] ([yshift=2.6mm]#1.west)
+   .. controls +(-1.05,0.55) and +(-1.05,-0.55) .. ([yshift=-2.6mm]#1.west);}
+\newcommand{\loopE}[1]{\draw[->, thick] ([yshift=-2.6mm]#1.east)
+   .. controls +(1.05,-0.55) and +(1.05,0.55) .. ([yshift=2.6mm]#1.east);}
+
+% ======================= (a) the modeling relation =====================
+\node[font=\scriptsize\bfseries, anchor=west, inner sep=0] at (0,1.45) {(a) Modeling relation};
+
+\node[sys] (N) at (3.15,0) {Natural\\system $N$};
+\node[sys] (F) at (8.85,0) {Formal\\system $F$};
+\loopW{N} \loopE{F}
+\node[lab, anchor=east] at (1.35,0) {causal\\entailment};
+\node[lab, anchor=west] at (10.7,0) {inferential\\entailment};
+
+\draw[->, thick] (N.south east) to[bend right=20]
+  node[below, lab] {encoding (observation, measurement)} (F.south west);
+\draw[->, thick] (F.north west) to[bend right=20]
+  node[above, lab] {decoding (prediction)} (N.north east);
+\node[note, text width=3.4cm] at (6.0,0)
+  { decoded inference in $F$\\ agrees with causation in $N$};
+
+% ======================= (b) where an LLM sits =========================
+\begin{scope}[yshift=-3.15cm]
+\node[font=\scriptsize\bfseries, anchor=west, inner sep=0] at (0,1.0) {(b) An LLM};
+
+\node[sys] (N2) at (3.15,0) {Natural\\system $N$};
+\node[aux] (T)  at (6.0,0) {text written by\\other observers};
+\node[sys] (L)  at (8.85,0) {LLM\\$p(\text{next token})$};
+\loopW{N2} \loopE{L}
+\node[lab, anchor=east] at (1.35,0) {causal\\entailment};
+\node[lab, anchor=west] at (10.7,0) {compressed\\statistics};
+
+\draw[->, thick] (N2) -- node[above, font=\tiny, inner sep=1.5pt] {des.} (T);
+\draw[->, thick] (T)  -- node[above, font=\tiny, inner sep=1.5pt] {train} (L);
+
+\node[note, text width=7cm] at (6.0,-1.55)
+  {dependencies in $p$ reflect how causal relations are talked about
+   (the meta-model of Ze\v{c}evi\'c et al.), not the structure of $N$};
+\end{scope}
+\end{tikzpicture}
