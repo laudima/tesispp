@@ -1,0 +1,100 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{xcolor}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\newcounter{comment}
+\newenvironment{comment}
+    {\refstepcounter{comment}\par\medskip\noindent\textbf{Comment \thecomment.}\itshape\ }
+    {\par}
+\newenvironment{response}
+    {\par\noindent\textbf{Response.}\ }
+    {\par\medskip}
+\newcommand{\changes}[1]{\par\noindent\textbf{Changes in the manuscript:} #1\par}
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+\begin{document}
+
+\begin{center}
+{\Large\bfseries Response to the Editor}\\[4pt]
+Diagnosing Causal Reasoning Failures in Large Language Models:\\
+Implications for LLM-Assisted Causal Discovery
+\end{center}
+
+Dear Editor,
+
+We thank you for the careful reading of our extended abstract and for the constructive comments. Below we reproduce each comment in italics, followed by our response and a description of the corresponding changes in the revised manuscript.
+
+\begin{comment}
+In the Introduction, when discussing ways to address non-identifiability, the authors forgot to mention non-Gaussian distributions exploited by approaches such as FASK or ICA-based ones like LiNGAM.
+\end{comment}
+\begin{response}
+\todo{reply}
+\changes{\todo{section and summary of the change}}
+\end{response}
+
+\begin{comment}
+I am not familiar with Rosen's framework, but the way it is described in the second paragraph of part 2 seems to be related to the concepts of Markov and Faithfulness assumptions for causal graphical models. Do the authors agree with this? If so, maybe those assumptions also can provide theoretical foundations to the approach suggested here.
+\end{comment}
+\begin{response}
+\todo{reply}
+\changes{\todo{section and summary of the change}}
+\end{response}
+
+\begin{comment}
+I do not see, apart from a seemingly vague aspect of Rosen's framework relating models and nature, what are the authors leveraging from this framework for their own approach. Can your framework work without Rosen's? I am confused about the role of Rosen's framework in this project.
+\end{comment}
+\begin{response}
+\todo{reply}
+\changes{\todo{section and summary of the change}}
+\end{response}
+
+\begin{comment}
+In Section 3, what do the authors refer to by ``subtypes'' and ``graph topology''.
+\end{comment}
+\begin{response}
+\todo{reply}
+\changes{\todo{section and summary of the change}}
+\end{response}
+
+\begin{comment}
+Model's error surface.
+\end{comment}
+\begin{response}
+\todo{reply}
+\changes{\todo{section and summary of the change}}
+\end{response}
+
+\begin{comment}
+Strongly suggest including a figure with a toy example of a ``failure DAG'' (step iv of the planned pipeline). It is hard to visualize how one of these graphs would look like.
+\end{comment}
+\begin{response}
+\todo{reply}
+\changes{\todo{section and summary of the change}}
+\end{response}
+
+\begin{comment}
+As this is a proof of concept and the project is in an early stage, please discuss more thoroughly the limitations and challenges that you are already confronting, or you expect to confront, and if possible how they could be addressed.
+\end{comment}
+\begin{response}
+\todo{reply}
+\changes{\todo{section and summary of the change}}
+\end{response}
+
+\begin{comment}
+The authors cited other papers exploring the relationship between LLMs and causal outputs, it would be relevant to include more detail of how these papers approached the questions pursued by the authors in this project.
+\end{comment}
+\begin{response}
+\todo{reply}
+\changes{\todo{section and summary of the change}}
+\end{response}
+
+We hope the revised version addresses the editor's concerns.
+
+Sincerely,\\
+Laura Itzel Rodríguez Dimayuga and Enrique Francisco Soto Astorga
+
+\end{document}
