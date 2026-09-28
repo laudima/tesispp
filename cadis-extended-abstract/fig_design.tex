@@ -1,0 +1,111 @@
+% ------------------------------------------------------------------
+% Fig. 1 
+% ------------------------------------------------------------------
+\definecolor{cComm}{HTML}{2B5C8A}
+\definecolor{cAnti}{HTML}{3F7F4F}
+\definecolor{cNons}{HTML}{A23B3B}
+\begin{tikzpicture}[
+  font=\scriptsize,
+  >={Stealth[length=1.5mm]},
+  var/.style={draw, rounded corners=1.5pt, inner sep=1.6pt, minimum height=3.4mm},
+  lat/.style={var, dashed, draw=black!55, text=black!60},
+  edge/.style={->, thin},
+  box/.style={draw, rounded corners=2pt, align=left, inner sep=3pt, fill=black!3},
+  row/.style={box, anchor=north west, minimum height=2.45cm},
+  cot/.style={box, dashed, fill=white},
+  ttl/.style={font=\scriptsize\bfseries, anchor=north west, inner sep=0},
+  body/.style={anchor=north west, text width=3.6cm, align=left, inner sep=0},
+]
+
+% ================= Row 1: the three variants =====================
+\def\W{3.85}\def\G{0.25}\def\H{3.3}
+\foreach \i/\c in {0/cComm,1/cAnti,2/cNons}{
+  \draw[rounded corners=2pt, draw=\c, line width=0.6pt]
+    ({\i*(\W+\G)},0) rectangle ({\i*(\W+\G)+\W},-\H);
+}
+
+% (a) Commonsensical: front-door graph
+\begin{scope}[shift={(0,0)}]
+  \node[ttl, text=cComm] at (0.15,-0.15) {(a) Commonsensical};
+  \node[lat] (u)  at (1.95,-0.62) {$U$};
+  \node[var] (x)  at (0.78,-1.15) {\textcolor{cComm}{\textbf{smoking}}};
+  \node[var] (m)  at (1.95,-1.15) {tar};
+  \node[var] (y)  at (3.15,-1.15) {cancer};
+  \draw[edge] (x) -- (m); \draw[edge] (m) -- (y);
+  \draw[edge, dashed, black!55] (u) -- (x); \draw[edge, dashed, black!55] (u) -- (y);
+  \node[body] at (0.15,-1.5) {%
+    Given: \dots\\ \hspace*{8pt}$P(\text{tar}\,|\,\text{smoking})=0.75$\\[1pt]
+    Q: Will \textcolor{cComm}{\textbf{smoking}} increase the chance of lung cancer?\\[1pt]
+    Ground truth: \textbf{Yes}};
+\end{scope}
+
+% (b) Anti-commonsensical: same item, one name changed
+\begin{scope}[shift={(\W+\G,0)}]
+  \node[ttl, text=cAnti] at (0.15,-0.15) {(b) Anti-commonsensical};
+  \node[lat] (u)  at (1.95,-0.62) {$U$};
+  \node[var] (x)  at (0.78,-1.15) {\textcolor{cAnti}{\textbf{jazz}}};
+  \node[var] (m)  at (1.95,-1.15) {tar};
+  \node[var] (y)  at (3.15,-1.15) {cancer};
+  \draw[edge] (x) -- (m); \draw[edge] (m) -- (y);
+  \draw[edge, dashed, black!55] (u) -- (x); \draw[edge, dashed, black!55] (u) -- (y);
+  \node[body] at (0.15,-1.5) {%
+    Given: \dots\\ \hspace*{8pt}$P(\text{tar}\,|\,\text{jazz})=0.75$\\[1pt]
+    Q: Will \textcolor{cAnti}{\textbf{listening to jazz}} increase the chance of lung cancer?\\[1pt]
+    Ground truth: \textbf{Yes}};
+\end{scope}
+
+% (c) Nonsensical: own graph and parameters
+\begin{scope}[shift={(2*\W+2*\G,0)}]
+  \node[ttl, text=cNons] at (0.15,-0.15) {(c) Nonsensical};
+  \node[var] (w)  at (1.95,-0.62) {xevo};
+  \node[var] (x)  at (0.78,-1.15) {\textcolor{cNons}{\textbf{zory}}};
+  \node[var] (y)  at (3.15,-1.15) {\textcolor{cNons}{\textbf{qixy}}};
+  \draw[edge] (w) -- (x); \draw[edge] (w) -- (y); \draw[edge] (x) -- (y);
+  \node[body] at (0.15,-1.5) {%
+    Given: \dots\\ \hspace*{8pt}$P(\text{qixy}\,|\,\text{zory})=0.31$\\[1pt]
+    Q: Will \textcolor{cNons}{\textbf{zory}} increase the chance of \textcolor{cNons}{\textbf{qixy}}?\\[1pt]
+    Ground truth: \textbf{No}};
+\end{scope}
+
+% braces over the variants
+\draw[decorate, decoration={brace, amplitude=3pt}, thin]
+  (0.05,0.08) -- ({2*\W+\G-0.05},0.08)
+  node[midway, above=3pt, align=center]
+  {\textbf{matched} 1,000 pairs\\ same graph, numbers and answer;names differs};
+\draw[decorate, decoration={brace, amplitude=3pt}, thin]
+  ({2*\W+2*\G+0.05},0.08) -- ({3*\W+2*\G-0.05},0.08)
+  node[midway, above=3pt, align=center] {\textbf{unpaired} \;$\cdot$\; 1,000 items\\ own graph and numbers};
+
+% ================= Row 2: direct condition ========================
+\node[row, text width=2.8cm] (prompt) at (0,-3.7) {%
+  \textbf{Prompt} (direct)\\
+  1.~background (graph)\\
+  2.~given information\\
+  3.~question\\
+  4.~\emph{Answer with Yes or No only.}};
+\node[row, right=0.3cm of prompt.north east, anchor=north west, text width=2.05cm] (model) {%
+  \textbf{Model}\\
+  4 open-weight\\ models,\\ 1.5B to 7.6B\\
+  chat template\\ 1 forward pass\\ no decoding};
+\node[row, right=0.3cm of model.north east, anchor=north west, text width=3.0cm] (read) {%
+  \textbf{Readout}: logits $\ell_t$ at the first answer token\\[2pt]
+  $P(\text{Yes})=\dfrac{S_{\mathcal{Y}}}{S_{\mathcal{Y}}+S_{\mathcal{N}}}$,\;
+  $S_{\mathcal{A}}=\textstyle\sum_{t\in\mathcal{A}}e^{\ell_t}$\\[2pt]
+  $\mathcal{Y},\mathcal{N}$: case and space\\ variants of Yes, No};
+\node[row, right=0.3cm of read.north east, anchor=north west, text width=2.25cm] (ana) {%
+  \textbf{Analysis}\\
+  Yes iff\\ \hspace*{4pt}$P(\text{Yes})>0.5$,\\ vs.\ ground truth\\[1pt]
+  H1: accuracy gap\\
+  H1b: $\Delta P(\text{Yes})$\\
+  H2: by rung};
+
+% bus from the three panels into the prompt
+\foreach \i in {0,1,2}{\draw ({\i*(\W+\G)+\W/2},-\H) -- ({\i*(\W+\G)+\W/2},-3.45);}
+\draw ({\W/2},-3.45) -- ({2*(\W+\G)+\W/2},-3.45);
+\draw[->] (prompt.north |- 0,-3.45) -- (prompt.north);
+
+\draw[->] (prompt) -- (model);
+\draw[->] (model) -- (read);
+\draw[->] (read) -- (ana);
+
+\end{tikzpicture}
