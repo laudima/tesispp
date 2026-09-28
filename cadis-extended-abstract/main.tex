@@ -24,6 +24,8 @@
 % Placeholder marker for values that depend on runs not yet completed. Remove before submission.
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 %
+\newif\ifincludeappendix
+\includeappendixfalse
 \begin{document}
 %
 \title{Diagnosing Causal Reasoning Failures in Large Language Models: Implications for LLM-Assisted Causal Discovery}
@@ -40,7 +42,7 @@
 \maketitle
 %
 \begin{abstract}
-Observational data alone does not, in general, identify a unique causal structure, so causal discovery relies on interventions, distributional assumptions, or background knowledge. Large language models (LLMs) are increasingly used as a source of such background knowledge, proposing edges, priors, or whole graphs from variable names. This practice presupposes that an LLM's causal judgments track causal structure rather than the plausibility of the words that name the variables. Drawing on Pearl's ladder of causation and on Rosen's distinction between reactive and anticipatory systems, as developed by Astorga and Letelier, we predicted that a system that compresses the statistics of text, without a model coupled to the system it describes, lets the plausibility of the words override the structure it is given. We tested this on 1,000 matched pairs of CLadder questions that state the same graph and probabilities and differ only in whether the variable names are commonsensical or anti-commonsensical, plus 1,000 items with nonsensical names, reading each model's probability of answering ``Yes''. Four light open-weight models (1.5--7.6B parameters) showed no plausibility penalty: no model was less accurate on anti-commonsensical items, and shifts in $P(\text{Yes})$ were small and in inconsistent directions. The result held when the models reasoned step by step first, which improved accuracy only for the largest model (0.57 to 0.64). Instead, the models barely used the given structure: accuracy stayed near chance, errors were nearly independent across query types, and reasoning traces often invented data. We discuss what this implies for LLM-elicited priors in hybrid causal discovery pipelines.
+Observational data alone does not, in general, identify a unique causal structure, so causal discovery relies on interventions, distributional assumptions, or background knowledge. Large language models (LLMs) are increasingly used as a source of such knowledge, proposing edges, priors, or whole graphs from variable names. This practice presupposes that their causal judgments track causal structure rather than the plausibility of the words that name the variables. Drawing on Pearl's ladder of causation and on Rosen's theory of anticipatory systems, as developed by Astorga and Letelier, we predicted that a system that compresses the statistics of text would let word plausibility override the structure it is given. We tested this on CLadder questions that state the same causal graph and probabilities with plausible, implausible, or invented variable names. In four light open-weight models, the names carried a strong plausibility prior when a question was asked on its own, but the given context removed it, contrary to our prediction. The context was not, however, used as structure: accuracy stayed close to chance, and the smaller models answered from the wording of the question rather than from the graph. We discuss what this implies for LLM-elicited priors in causal discovery.
 
 \keywords{Causal discovery \and Large language models \and Causal reasoning \and Pearl's causal hierarchy \and CLadder \and Commonsense priors \and Anticipatory systems}
 \end{abstract}
@@ -82,7 +84,9 @@ Long et al.\ used LLMs to score candidate edges in medical causal graphs and fou
   In the direct condition the model answers in one forward pass and
   P(Yes) is read from the logits of the first answer token. In the
   exploratory CausalCoT condition the model first reasons, then answers
-  in a second turn, read the same way.}
+  in a second turn, read the same way. In the question-only condition the
+  model sees the question alone, without the graph or the numbers, which
+  measures the prior carried by the names.}
   \label{fig:design}
 \end{figure}
 
@@ -170,54 +174,39 @@ The commonsensical and anti-commonsensical files of CLadder v1 contain the same 
 
 We tested four smaller AI models: SmolLM2-1.7B-Instruct, Qwen2.5-1.5B-Instruct, Phi-3.5-mini-instruct (3.8B), and Qwen2.5-7B-Instruct. We ran SmolLM2 and Qwen2.5-1.5B using full precision (32-bit) because they fit on the GPU, which made their 'Yes' probabilities consistent. Phi-3.5 and Qwen2.5-7B were too large, so we used a special method (4-bit quantization and 16-bit computation) to load them. This means their 'Yes' probabilities might vary slightly depending on how items are grouped. All models were tested with the same 3,000 items, grouped in batches of 8 for direct questions and 32 for CausalCoT questions. We recorded all results with details about each model's settings.
 
-\subsection{Prompting and answer probabilities}
-\label{sec:prompting}
+\subsection{Three runs}
+\label{sec:runs}
 
-In the \emph{direct} condition, each item is a single user turn with four lines: the CLadder background, which states the causal graph; the given information; the question; and ``Answer with Yes or No only.'' The model's chat template is applied and no text is generated. We run one forward pass and read the logits of the answer tokens at the first generated position, summing over case and leading-space forms of each word:
+Every run asks the model for a single Yes/No answer and reads, instead of generating and parsing text, the probability it assigns to each answer at the first output position:
 \[
 P(\text{Yes}) = \frac{\sum_{t \in \mathcal{Y}} e^{\ell_t}}{\sum_{t \in \mathcal{Y}} e^{\ell_t} + \sum_{t \in \mathcal{N}} e^{\ell_t}},
 \]
-where $\mathcal{Y}$ and $\mathcal{N}$ are the single-token forms of ``Yes'' and ``No''. The answer is constrained to Yes or No: the prediction is ``Yes'' when $P(\text{Yes}) > 0.5$, and $P(\text{Yes})$ is kept as a graded measure of the model's preference. This removes answer parsing, and the probability mass on the two answers (median $\geq 0.97$ for every model and condition) confirms that the models were answering the question.
+where $\ell_t$ is the logit of token $t$ and $\mathcal{Y}$, $\mathcal{N}$ are the single-token forms of ``Yes'' and ``No''. The answer is ``Yes'' when $P(\text{Yes}) > 0.5$, and $P(\text{Yes})$ is kept as a graded measure of the model's preference. We conducted three runs, each with a different prompt. Each run was tested with the three types of question (commonsensical, anti-commonsensical, nonsensical).
 
-\subsection{Exploratory CausalCoT condition}
-\label{sec:cot}
+\emph{Direct.} The model receives the CLadder background, which states the causal graph, the given probabilities, the question, and ``Answer with Yes or No only.'' This run tests whether the answer follows the given structure, and whether it changes with the type of question.  Ran this with 1,000 commonsensical, 1,000 anti-commonsensical, and 1,000 nonsensical items per model.
 
-After the direct runs, we added a condition that asks the model to reason first. It uses a balanced subset of 150 pairs and 150 nonsensical items per model. % UPDATE-QWEN7B: Qwen2.5-7B extended to N pairs
-In a first turn the model receives the same background, information, and question followed by the six CausalCoT steps of Jin et al.\ \cite{jin2023cladder}: extract the graph, identify the query type, formalize it, gather the data, derive the estimand, and compute it. It generates its reasoning greedily, up to 1,024 new tokens. The reasoning is kept in the conversation, a second turn asks ``Based on all the reasoning above, answer the initial question with just Yes or No.'', and $P(\text{Yes})$ is read at the first answer token exactly as in the direct condition. As output the model produces a reasoning trace and an answer, but the trace is not evaluated. The CausalCoT condition is exploratory: it was added after the direct runs, the sample is smaller, and the runs are not repeated. To evaluate the final answer, we put a limit of 1,024 tokens on the reasoning trace and a limit of 128 tokens on the answer, which was sufficient for all items.
+\emph{CausalCoT.} The model first writes out its reasoning following the six steps of Jin et al.\ \cite{jin2023cladder} (extract the graph, identify the query type, formalize it, gather the data, derive the estimand, compute it), and is then asked for the Yes/No answer. This run tests whether step-by-step reasoning helps small models use the structure. It was added after the direct run and uses a subset of 150 pairs and 150 nonsensical items per model.
+
+\emph{Question-only.} The model receives only the question and ``Answer with Yes or No only.'', without the background or the probabilities. Its $P(\text{Yes})$ is then the model's \emph{prior} for the question as worded, which is what the variable names alone suggest. This run checks the assumption behind H1 and H1b: that anti-commonsensical names carry a prior against the stated relation. If they do not, the direct run cannot distinguish our account from its alternative. It was added after the other two runs and uses the 1,000 matched pairs.
 
 \subsection{Analysis}
 \label{sec:analysis}
 
-\emph{Accuracy.} An item is correct when the thresholded answer matches CLadder's ground truth. We report accuracy with 95\% Wilson score intervals, which, unlike the normal approximation, stay inside $[0,1]$ and keep close to nominal coverage for the smaller subgroups (a single rung, query type, or topology).
+For each model and run we report accuracy with 95\% Wilson intervals, separately for the three types of question. Commonsensical and anti-commonsensical items are compared within matched pairs (bootstrap interval over pairs and exact McNemar test); nonsensical items are compared with commonsensical items as independent groups (Newcombe's interval). For the question-only run, the \emph{prior gap} is the mean difference in $P(\text{Yes})$ between the commonsensical and the anti-commonsensical question of each pair; we compare it with the same difference when the question is asked in context (direct run). A large prior gap that disappears in context means that the given context overrides the names; a prior gap near zero means that the names carry no prior to override. The study is exploratory and serves to test the design planned for the first author's thesis; intervals are not corrected for multiplicity.
 
-\emph{H1: accuracy gap.} The gap is commonsensical minus anti-commonsensical accuracy, so a positive value is the penalty that the plausibility account predicts. Because the two items of a pair share the graph, the probabilities, and the answer, we compute the gap within pairs rather than between two independent groups. For each pair we record the difference in correctness ($+1$, $0$, or $-1$), take the mean over the 1,000 pairs, and obtain a 95\% percentile bootstrap interval by resampling pairs 10,000 times. The paired design removes the variation due to item difficulty, which would otherwise dominate a comparison of two group accuracies. We test the null of no gap with an exact McNemar test. It uses only the discordant pairs, those answered correctly under one name and incorrectly under the other, and asks whether the two kinds of discordance are equally frequent. Nonsensical items share no parameters with the other two variants, so they cannot be paired. We compare them with commonsensical items as independent proportions and use Newcombe's hybrid score interval for the difference, which combines the two Wilson intervals.
-
-\emph{H1b: shift in $P(\text{Yes})$.} Accuracy only registers a name effect that is large enough to push $P(\text{Yes})$ across 0.5. H1b measures the effect directly on the probability. For each pair we take the commonsensical minus the anti-commonsensical $P(\text{Yes})$, average over pairs, and bootstrap the mean as for H1. A positive shift means that the model is less inclined to say that the stated relation holds when it involves an implausible variable. We restrict H1b to the query types in which the question asserts a relation between a treatment $X$ and an outcome $Y$: conditional probability, the average treatment effect and its version on the treated, the natural direct and indirect effects, and deterministic counterfactuals. A plausibility prior makes a directional prediction only for these. For the others (marginal probabilities, the choice of an adjustment set, collider bias, and explaining away), the answer does not state that $X$ affects $Y$, and implausible names have no predicted direction. We compute the shift separately for items whose correct answer is Yes and No. If a model follows the given structure, $P(\text{Yes})$ should be high on the first and low on the second, whatever the names. A plausibility prior should lower it on both. Pooling the two would mix the shift with the answer composition of the subset.
-
-\emph{H2 and the CausalCoT comparison.} H2 compares accuracy across the three rungs, each with its Wilson interval; the sample is stratified so that every rung has the same share of Yes answers. The CausalCoT condition is compared with the direct condition on the same 450 items per model. We report the paired difference in accuracy with a bootstrap interval, and test it with an exact McNemar test on the items whose correctness changes between the two conditions.
-
-Accuracy thresholds $P(\text{Yes})$ at 0.5 and therefore mixes two things: whether the model's preference follows the correct answer, and where its overall bias lies. We separate them with two further measures. \emph{Discrimination} is the area under the ROC curve (AUROC) of $P(\text{Yes})$ against the correct answer: 0.5 means that the probability carries no information about the answer, whatever the bias. \emph{Name sensitivity} is the share of matched pairs whose thresholded answer flips when the variable is renamed; unlike the gap, it counts changes in either direction. To read null results, we treat differences within $\pm 0.04$ (four accuracy points, or 0.04 in mean $P(\text{Yes})$) as negligible. This bound was fixed after the direct runs, from the 1.8-point gap Jin et al.\ report for GPT-4 \cite{jin2023cladder}, and we use it descriptively rather than as a formal equivalence test.
-
-% EDITOR: toy example of a "failure DAG" -> replaced by the real failure graph (Fig. 1).
-% EDITOR: "model's error surface" (unclear term) -> replaced by the defined failure graph.
+% Detailed analysis plan (belief congruence, polarity, AUROC, noise floor): appendix.tex
 
 \section{Results}
 \label{sec:results}
 
-We report four findings in turn: the variable names do not move the answers in the predicted direction (Sect.~\ref{sec:res-names}); the answers carry little information about the given structure (Sect.~\ref{sec:res-structure}); what little variation there is follows the query type, not the rung or the topology (Sect.~\ref{sec:res-where}); and reasoning first changes the bias more than the accuracy (Sect.~\ref{sec:res-cot}).
+\subsection{Direct run: near-chance accuracy and no difference between question types}
+\label{sec:res-direct}
 
-\subsection{Variable names do not shift the answers in the predicted direction (H1, H1b)}
-\label{sec:res-names}
-
-All four models are between 0.50 and 0.60 accurate on every variant (Table~\ref{tab:variants}, Fig.~\ref{fig:acc-variant}). On the 1,000 matched pairs no model is less accurate on anti-commonsensical items (Fig.~\ref{fig:forest}a). The gaps are $+0.002$ (SmolLM2), $+0.014$ (Qwen2.5-1.5B, 95\% CI $-0.013$ to $0.042$), $+0.014$ (Phi-3.5, $-0.014$ to $0.042$), and $-0.025$ (Qwen2.5-7B, $-0.055$ to $0.005$), with no McNemar test below $p = 0.12$. Every upper bound lies at or below $0.042$, so a plausibility penalty larger than about four points is excluded for each model; Qwen2.5-7B's interval extends further on the other side, towards higher accuracy on anti-commonsensical items. Commonsensical and nonsensical accuracy do not differ either (largest gap $+0.034$, Phi-3.5, 95\% CI $-0.009$ to $0.077$).
-
-The paired probabilities show the same result item by item (Fig.~\ref{fig:scatter}). The plausibility account predicts that the points fall below the diagonal. For every model the share below it is between 0.45 and 0.56. For H1b (Fig.~\ref{fig:forest}b), only Phi-3.5 shifts in the predicted direction, assigning about 0.05 less probability to ``Yes'' on anti-commonsensical items (Yes items: 95\% CI $0.004$ to $0.103$; No items: $0.001$ to $0.098$). Both Qwen models shift the other way on Yes items ($-0.044$ and $-0.050$, both intervals excluding zero), and SmolLM2's shifts are below 0.01.
-
-The names are not irrelevant, however. Renaming one variable flips the answer on 20\% (Qwen2.5-1.5B), 21\% (Phi-3.5), and 24\% (Qwen2.5-7B) of pairs, and the paired probabilities are only moderately correlated (Spearman $\rho = 0.65$--$0.76$). These flips are close to symmetric: in Qwen2.5-7B, 107 pairs are correct only under the commonsensical name and 132 only under the anti-commonsensical one. The names therefore add item-level noise to the answers, but not the directional pull toward plausibility that the account predicts. SmolLM2 flips on fewer than 1\% of pairs, because it answers ``No'' to almost every item.
+All four models answer close to chance, between 0.50 and 0.60 on every type of question (Table~\ref{tab:variants}, Fig.~\ref{fig:acc-variant}). The three types of question do not differ for any model. On the 1,000 matched pairs, commonsensical minus anti-commonsensical accuracy is $+0.002$ (SmolLM2), $+0.014$ (Qwen2.5-1.5B, 95\% CI $-0.013$ to $0.042$), $+0.014$ (Phi-3.5, $-0.014$ to $0.042$), and $-0.025$ (Qwen2.5-7B, $-0.055$ to $0.005$), with no McNemar test below $p = 0.12$; commonsensical and nonsensical accuracy differ by at most $0.034$ (Phi-3.5, $-0.009$ to $0.077$). Accuracy does not decrease with the rung either (H2): for Qwen2.5-7B it is 0.52, 0.64, and 0.57 at L1--L3. The models are also strongly biased: SmolLM2 answers ``No'' to all but 0.1\% of the items, so its accuracy is the share of ``No'' answers in each group.
 
 \begin{table}[!htbp]
 \centering
-\caption{Direct condition: accuracy (95\% Wilson CI) by commonsense alignment on 1,000 items per variant, and mean $P(\text{Yes})$ on commonsensical/anti-commonsensical relational items whose correct answer is ``Yes'' (330 pairs).}
+\caption{Direct run: accuracy (95\% Wilson CI) by type of question, 1,000 items per type, and mean $P(\text{Yes})$ on commonsensical/anti-commonsensical relational items whose correct answer is ``Yes'' (330 pairs).}
 \label{tab:variants}
 \scriptsize
 \begin{tabular}{lcccc}
@@ -233,7 +222,7 @@ Model & Comm. & Nonsens. & Anti-C. & $\bar P(\text{Yes})$ Comm./Anti-C. \\
   \centering
   \begin{subfigure}[b]{0.49\textwidth}
     \includegraphics[width=\linewidth]{./figures/accuracy_by_variant.pdf}
-    \caption{Direct condition, 1,000 items per variant.}
+    \caption{Direct run, 1,000 items per type.}
     \label{fig:acc-variant}
   \end{subfigure}\hfill
   \begin{subfigure}[b]{0.49\textwidth}
@@ -248,79 +237,60 @@ Model & Comm. & Nonsens. & Anti-C. & $\bar P(\text{Yes})$ Comm./Anti-C. \\
   \label{fig:accuracy}
 \end{figure}
 
-\begin{figure}[!htbp]
-  \centering
-  \includegraphics[width=0.78\textwidth]{./figures/paired_pyes_scatter.pdf}
-  \caption{$P(\text{Yes})$ for the 1,000 matched pairs in the direct condition: the commonsensical item on the $x$-axis and its anti-commonsensical twin, with the same graph, probabilities, and answer, on the $y$-axis (logit scale; values beyond $10^{-6}$ are drawn at the edge). The plausibility account predicts points below the diagonal. Instead, the points scatter symmetrically around it, and the colours, which mark the correct answer, overlap. \emph{Answer flips}: share of pairs whose thresholded answer differs between the two names.}
-  \label{fig:scatter}
-\end{figure}
-
-\begin{figure}[!htbp]
-  \centering
-  \includegraphics[width=\textwidth]{./figures/forest_effects.pdf}
-  \caption{Commonsensical minus anti-commonsensical effects with 95\% bootstrap intervals, direct (1,000 pairs) and CausalCoT (150 pairs). Positive values are the predicted plausibility penalty. (a) Accuracy gap (H1). (b) Shift in mean $P(\text{Yes})$ on relational items (H1b), separately for items whose correct answer is Yes (filled) and No (open). The shaded band marks $\pm 0.04$.}
-  \label{fig:forest}
-\end{figure}
-
-\subsection{The answers carry little information about the given structure}
-\label{sec:res-structure}
-
-Accuracy near 0.5 could hide a model that ranks the items correctly but sits at the wrong threshold. The distribution of $P(\text{Yes})$ separated by the correct answer rules this out (Fig.~\ref{fig:discrimination}). On all 3,000 direct items, the AUROC is 0.50 for SmolLM2, 0.53 for Qwen2.5-1.5B, 0.61 for Phi-3.5, and 0.62 for Qwen2.5-7B. For the two small models the Yes and No distributions almost coincide. For the two larger ones they differ, but mainly through a mass of confident ``No'' answers that is present for both kinds of item. The models are also strongly biased, in different directions: SmolLM2 answers ``Yes'' to 0.1\% of items, Phi-3.5 to 33\%, Qwen2.5-7B to 48\%, and Qwen2.5-1.5B to 50\%, all on a set with 50\% Yes answers. Accuracy, bias, and discrimination together say that the probabilities follow the given graph and numbers only weakly.
-
-\begin{figure}[!htbp]
-  \centering
-  \includegraphics[width=\textwidth]{./figures/discrimination_pyes.pdf}
-  \caption{Distribution of $P(\text{Yes})$ for items whose correct answer is No (left halves) and Yes (right halves), on the same 450 items in the direct and CausalCoT conditions; horizontal ticks are medians. AUROC $=0.5$ means that $P(\text{Yes})$ carries no information about the correct answer. For the small models, CausalCoT mainly shifts both distributions upward; for Qwen2.5-7B, it separates them.}
-  \label{fig:discrimination}
-\end{figure}
-
-\subsection{Accuracy follows the query type, not the rung or the topology (H2)}
-\label{sec:res-where}
-
-Accuracy does not decrease with the rung. For every model whose accuracy varies, L1 is the lowest rung; for Qwen2.5-7B it is 0.52, 0.64, and 0.57 at L1--L3. The larger differences are between query types within a rung (Fig.~\ref{fig:heatmap}). The average treatment effect is the only query type that the three informative models answer well across topologies (0.59--0.76 accuracy). The choice of adjustment set and collider bias, also at L2, are below chance. Collision graphs, which contain only L1 questions, adjustment set, and collider bias, are the hardest topology for every model (0.33--0.46).
-
-The low cells are not caused by difficult numbers. They occur because some query types receive the same answer whatever the item says. Phi-3.5 and Qwen2.5-7B answer ``No'' to every collider-bias question, Qwen2.5-7B answers ``No'' to 99\% of adjustment-set questions, and Phi-3.5 answers ``No'' to 99\% of marginal-probability questions, although the correct answer is ``Yes'' on 47--54\% of the items of each of these query types. In these cells the answer is determined by the wording of the question template, not by the graph or the probabilities it states. The failure graphs point the same way: every lift between query types is below 1.3 (largest: from the average treatment effect to the natural indirect effect for Qwen2.5-7B, 1.28), so errors on one query type barely predict errors on another.
-
-\begin{figure}[!htbp]
-  \centering
-  \includegraphics[width=\textwidth]{./figures/heatmap_query_topology.pdf}
-  \caption{Direct-condition accuracy by query type (rows, grouped by rung) and graph topology (columns). (a) Pooled over Qwen2.5-1.5B, Phi-3.5, and Qwen2.5-7B; (b) Qwen2.5-7B alone. SmolLM2 is omitted because its accuracy in each cell equals the share of ``No'' answers. Bold values have a 95\% Wilson interval that excludes 0.5; blank cells are combinations that CLadder does not generate.}
-  \label{fig:heatmap}
-\end{figure}
-
-\subsection{Reasoning first shifts the bias more than the accuracy (exploratory)}
+\subsection{CausalCoT run: no gain for the small models}
 \label{sec:res-cot}
 
-Table~\ref{tab:cot} and Fig.~\ref{fig:acc-cot} compare the two conditions on the same 450 items. % UPDATE-QWEN7B: numbers below for Qwen2.5-7B
-Reasoning first raises accuracy significantly only for Qwen2.5-7B, from 0.57 to 0.64 (paired difference $+0.073$, 95\% CI $0.029$ to $0.118$, McNemar $p = 0.002$). The changes for Qwen2.5-1.5B ($+0.047$, $p = 0.16$), Phi-3.5 ($+0.022$, $p = 0.43$), and SmolLM2 ($-0.007$) are not significant. Qwen2.5-7B is also the only model whose discrimination clearly improves (AUROC 0.60 to 0.72 on these items; Fig.~\ref{fig:discrimination}). For the two small models, reasoning mainly moves the whole distribution toward ``Yes'', from 0.50 to 0.78 ``Yes'' for Qwen2.5-1.5B and from 0.00 to 0.63 for SmolLM2, while AUROC stays at 0.49--0.55. Reasoning does not produce a plausibility effect: no paired accuracy gap and no $P(\text{Yes})$ shift differs from zero (Fig.~\ref{fig:forest}, orange). With 150 pairs, however, these intervals are about $\pm 0.08$ wide and cannot exclude effects of that size. After regeneration at 1,024 tokens, 3--8\% of traces per model still reached the limit, at similar rates across variants.
+Reasoning step by step did not improve the small models (Table~\ref{tab:cot-variants}, Fig.~\ref{fig:acc-cot}). On the same 450 items, accuracy changes by $-0.007$ for SmolLM2, $+0.047$ for Qwen2.5-1.5B ($p = 0.16$), and $+0.022$ for Phi-3.5 ($p = 0.43$). Only Qwen2.5-7B improves significantly, from 0.57 to 0.64 ($+0.073$, 95\% CI $0.029$ to $0.118$, $p = 0.002$). For the two smallest models, reasoning mainly shifts the answers toward ``Yes'' rather than toward the correct answer. The types of question still do not differ: no model's commonsensical accuracy differs significantly from its nonsensical or its anti-commonsensical accuracy after reasoning (with 150 items per type, the intervals are about $\pm 0.1$ wide).
 
 \begin{table}[!htbp]
 \centering
-\caption{Direct and CausalCoT conditions on the same 450 items per model (150 pairs + 150 nonsensical items): accuracy, commonsensical minus anti-commonsensical accuracy on matched pairs (95\% bootstrap CI), and share of CausalCoT traces that reached the 1,024-token limit.} % UPDATE-QWEN7B
-\label{tab:cot}
+\caption{Accuracy by type of question in the direct and CausalCoT runs, on the same 450 items per model (150 per type), and the change in overall accuracy with CausalCoT (95\% bootstrap CI; exact McNemar $p$).}
+\label{tab:cot-variants}
 \scriptsize
-\begin{tabular}{lccccc}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccccccc c}
 \toprule
-Model & Acc.\ direct & Acc.\ CoT & Gap direct & Gap CoT & Trunc. \\
+ & \multicolumn{3}{c}{Direct} & \multicolumn{3}{c}{CausalCoT} & & \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Model & Comm. & Nons. & Anti-C. & Comm. & Nons. & Anti-C. & Change & $p$ \\
 \midrule
-\csname @@input\endcsname tables/cot_rows.tex
+\csname @@input\endcsname tables/cot_variants_rows.tex
 \bottomrule
 \end{tabular}
 \end{table}
 
-The traces show why. The models often do not use the information they are given. Deterministic counterfactual questions provide no probabilities, only logical relations, yet 81\% of Qwen2.5-1.5B traces and 74\% of SmolLM2 traces on these items state probability values, against 12\% for Phi-3.5 and 9\% for Qwen2.5-7B (43 items each; a text heuristic). Other traces misidentify the query type, for example by treating a choice between two adjustment strategies as an average treatment effect and waiting for probabilities that the question does not contain. The model that invents data least is also the only one that benefits from reasoning.
+\subsection{Question-only run: the names carry a prior that the context overrides}
+\label{sec:res-prior}
+
+The only large and consistent differences between types of question appear when the question is asked alone. Without the background and the probabilities, every model assigns much less probability to ``Yes'' on the anti-commonsensical question than on its commonsensical twin (Table~\ref{tab:prior}): the prior gap is between $0.09$ (SmolLM2) and $0.23$ (Qwen2.5-7B), with every interval far from zero, and the anti-commonsensical question receives the lower $P(\text{Yes})$ in 73--78\% of pairs. The names therefore carry the prior that H1 and H1b assume, and the models tested are not too small to hold it. When the same questions are asked with the graph and the probabilities, the gap largely disappears: it falls to $-0.023$ to $+0.006$ for three models, and to $+0.037$ for Phi-3.5, which keeps about a sixth of its prior gap. The given context overrides the names.
+
+Overriding the names is not the same as using the structure. For each model, we regressed the in-context $\operatorname{logit} P(\text{Yes})$ on the question-only $\operatorname{logit} P(\text{Yes})$ and on the correct answer. For SmolLM2 and Qwen2.5-1.5B, the correct answer explains none of the in-context probability, while the question-only prior still explains 9--17\% of its variance; for Phi-3.5 and Qwen2.5-7B, both terms contribute, and only Qwen2.5-7B depends more on the correct answer than on the prior. The small models remove the effect of the names without replacing it with the given structure: their answers follow how the question is worded.
+
+\begin{table}[!htbp]
+\centering
+\caption{Question-only run on the 1,000 matched pairs. Mean $P(\text{Yes})$ when the question is asked alone (commonsensical/anti-commonsensical), the prior gap (commonsensical minus anti-commonsensical, 95\% bootstrap CI), and the same gap when the question is asked in context (direct run).}
+\label{tab:prior}
+\scriptsize
+\begin{tabular}{lccc}
+\toprule
+Model & $\bar P(\text{Yes})$ alone, Comm./Anti-C. & Prior gap & Gap in context \\
+\midrule
+\csname @@input\endcsname tables/prior_rows.tex
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Discussion and Limitations}
 \label{sec:discussion}
 
-\paragraph{The prediction is not supported.} By the criterion stated in Sect.~\ref{sec:predictions}, the absence of both an accuracy gap and a consistent $P(\text{Yes})$ shift counts against the word-plausibility account for these models. With 1,000 matched pairs, the direct condition rules out anti-commonsensical penalties larger than about four points, and the only shift in the predicted direction (Phi-3.5) is offset by shifts in the opposite direction in both Qwen models. The same holds when the models reason first. This agrees with Jin et al., who found only a 1.8-point gap for GPT-4 \cite{jin2023cladder}.
+\paragraph{The prediction is not supported, although the prior is there.} By the criterion stated in Sect.~\ref{sec:predictions}, the absence of an accuracy gap and of a consistent shift in $P(\text{Yes})$ between commonsensical and anti-commonsensical items counts against the word-plausibility account for these models, with or without step-by-step reasoning. This agrees with Jin et al., who found only a 1.8-point gap for GPT-4 \cite{jin2023cladder}. The question-only run rules out the most obvious escape: the models do hold the prior that the account relies on, and hold it strongly. Asked alone, the anti-commonsensical question receives 0.09--0.23 less probability of ``Yes''. With the graph and the numbers in the prompt, this gap almost vanishes. Plausibility is present, but at this scale the given context overrides it.
 
-\paragraph{What limits these models.} The names change individual answers but do not pull them toward plausibility, and the models are also largely insensitive to the structure. Accuracy is near chance, $P(\text{Yes})$ barely discriminates the correct answer, several query types receive the same answer whatever the numbers, and the traces invent data and misread the question. The failure is one of grounding, of using the graph and information given in the prompt, rather than of plausibility overriding structure. This is compatible with the reactive-systems frame of Sect.~\ref{sec:rosen}, but it is not the specific mechanism we predicted. Two readings remain open. The prediction may be wrong, or it may require models that have absorbed enough causal statements for plausibility to pull their answers, which the causal parrots account \cite{Zecevic2023CausalPL} and the high pairwise accuracy of larger models \cite{kiciman2023causal} suggest; at 1.5--7B parameters the priors may simply be too weak to matter. Only the larger models can separate these readings. Reasoning helped only Qwen2.5-7B, the model that invents data least: it helps a model that uses the given information, not one that replaces it. Butkus and Kriegeskorte's result \cite{butkus2025causal}, where next-token prediction on data generated by causal models yields causal inference, is consistent with the architectural claim: what these models lack is a training signal coupled to the system they are asked about, not a capacity for prediction.
+\paragraph{What limits these models.} The context overrides the names without being used as structure. Accuracy is near chance, several query types receive the same answer whatever the numbers, the reasoning traces often invent data, and for the two smallest models the in-context answer follows the question-only prior and not the correct answer. The failure is one of grounding, of using the graph and information given in the prompt, rather than of plausibility overriding structure. This is compatible with the reactive-systems frame of Sect.~\ref{sec:rosen}, in which the answer is a response to the form of the input rather than the output of a model of the system described, but it is not the specific mechanism we predicted. Reasoning helped only Qwen2.5-7B, which invents data least and whose answers depend more on the correct answer than on the prior: reasoning helps a model that uses the given information, not one that replaces it. Butkus and Kriegeskorte's result \cite{butkus2025causal}, where next-token prediction on data generated by causal models yields causal inference, is consistent with the architectural claim: what these models lack is a training signal coupled to the system they are asked about, not a capacity for prediction.
 
-\paragraph{Implications for LLM-elicited priors.} At this scale, a model's causal judgments are neither misled by plausible names nor informed by the structure it is shown, so its priors are close to uninformative for orienting edges. For larger models the risk we set out to test remains open: priors that follow how relations are described in text would be most misleading in the cases where background knowledge is most needed, when relations are new or counterintuitive. In both cases, causal relationships used in discovery should be grounded in experiments, simulations, or explicit distributional assumptions such as those of LiNGAM and FASK; LLM priors can propose hypotheses to be tested, not replace that grounding.
+\paragraph{Implications for LLM-elicited priors.} The two runs correspond to two ways of using an LLM in causal discovery. Asked about a relation between named variables and nothing else, as in pairwise edge queries \cite{kiciman2023causal,long2023can}, these models answer according to how plausible the names make the relation. Given explicit structure and data, they suppress that prior but do not reliably compute with what they are given. In neither case is the answer grounded in the causal structure of the system. Causal relationships used in discovery should therefore be grounded in experiments, simulations, or explicit distributional assumptions such as those of LiNGAM and FASK; LLM priors can propose hypotheses to be tested, not replace that grounding.
 
 \paragraph{Limitations.} We tested four small models that are not trained as reasoning models; two ran in 4-bit quantization. Current reasoning models, and their distillations into models of the same size, may behave differently. We used a single prompt wording per condition. CLadder gives the graph and the information in the prompt, so it tests inference from given structure, not the recovery of structure that discovery requires, and its stories are generated from templates. The CausalCoT condition was added after the direct results, uses 150 pairs per model (intervals of about $\pm 0.08$ on the gap), and 3--8\% of its traces were truncated; the Qwen2.5-7B subset was enlarged after the first results. % UPDATE-QWEN7B
-The invented-data rate is a text heuristic. Finally, thresholding $P(\text{Yes})$ at 0.5 mixes answer bias into accuracy, as SmolLM2 shows.
+The question-only prompt is unusual for the models, which mostly answer ``No'' to it (3--16\% ``Yes''), so the prior is measured by the probability of ``Yes'' rather than by the answers. The invented-data rate is a text heuristic. Finally, thresholding $P(\text{Yes})$ at 0.5 mixes answer bias into accuracy, as SmolLM2 shows.
 
 \paragraph{Practical challenges.} A first run of SmolLM2 on all 10,560 items of the CLadder v1 easy file, generating and parsing answers, took 31 hours and lost answers to over-length and unreadable responses; it was near chance (0.47) with 64\% ``yes'' answers. Reading answer probabilities from a single forward pass removed both problems. Half-precision arithmetic made the probabilities depend on batching. We removed this with 32-bit computation for the two smallest models, but the two larger models only fit in 4-bit quantization with 16-bit computation. For the CausalCoT condition, reasoning traces of 512 tokens were often too short, and regenerating only the truncated traces at a higher limit kept the cost manageable.
 
@@ -329,11 +299,16 @@ The invented-data rate is a text heuristic. Finally, thresholding $P(\text{Yes})
 \section{Conclusion}
 \label{sec:conclusion}
 
-LLMs are increasingly used as a stand-in for domain experts in causal discovery. From Pearl's ladder of causation and Rosen's distinction between reactive and anticipatory systems, as developed by Astorga and Letelier, we predicted that a system which compresses the statistics of text would let the plausibility of variable names override the causal structure it is given. On matched CLadder questions that differ only in the names, four light open-weight models showed no such effect, with or without step-by-step reasoning. Their failure is different: they barely use the structure and information in the prompt, and reasoning helps only the model that grounds it. For practitioners, the conclusion is the same either way: causal relationships used in discovery should be grounded in experiments, simulations, or explicit assumptions, and LLM priors treated as hypotheses. Future work will test larger and reasoning models, where plausibility effects may appear, and compare these patterns with human commonsense causal reasoning \cite{penn2007causal}.
+LLMs are increasingly used as a stand-in for domain experts in causal discovery. From Pearl's ladder of causation and Rosen's distinction between reactive and anticipatory systems, we predicted that a system which compresses the statistics of text would let the plausibility of variable names override the causal structure it is given. On matched CLadder questions that differ only in the names, four light open-weight models showed no such effect, with or without step-by-step reasoning, although asked alone the same questions revealed a strong plausibility prior. The given context overrides the prior, but the models barely use it as structure, and reasoning helps only the model that grounds it. For practitioners, the conclusion is the same either way: causal relationships used in discovery should be grounded in experiments, simulations, or explicit assumptions, and LLM priors treated as hypotheses. Future work will test larger and reasoning models, whose stronger priors may no longer be overridden, and compare these patterns with human commonsense causal reasoning \cite{penn2007causal}.
 
 %
 % ---- Bibliography ----
 %
 \bibliographystyle{splncs04}
 \bibliography{references}
+% Detailed analyses of the direct and CausalCoT runs: set \includeappendixtrue to add them.
+\ifincludeappendix
+\appendix
+\input{appendix}
+\fi
 \end{document}
