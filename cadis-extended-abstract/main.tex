@@ -16,13 +16,6 @@
 \setcounter{topnumber}{3}
 \setcounter{totalnumber}{4}
 \usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc,decorations.pathreplacing}
-\setlength{\fboxsep}{6pt}
-\newsavebox{\editorcommentbox}
-\newenvironment{editorcomment}
-    {\begin{lrbox}{\editorcommentbox}\begin{minipage}{0.95\linewidth}\small}
-    {\end{minipage}\end{lrbox}\par\medskip\noindent\fbox{\usebox{\editorcommentbox}}\par\medskip}
-% Placeholder marker for values that depend on runs not yet completed. Remove before submission.
-\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 %
 % Left-aligned cell in p{} table columns
 \newcommand{\rr}{\raggedright\let\\\tabularnewline}
@@ -31,8 +24,6 @@
 \definecolor{cAnti}{HTML}{3F7F4F}
 \definecolor{cNons}{HTML}{A23B3B}
 
-\newif\ifincludeappendix
-\includeappendixfalse
 \begin{document}
 %
 \title{Diagnosing Causal Reasoning Failures in Large Language Models: Implications for LLM-Assisted Causal Discovery}
@@ -143,9 +134,6 @@ The causal Markov condition states that each variable is independent of its non-
 
 The distinction clarifies the position of an LLM. Even if the Markov and faithfulness conditions hold for the system described in a CLadder question, the model's output distribution is not a distribution over that system's variables. It is a distribution over text, produced by people describing their own Umwelten. Dependencies in that distribution reflect how causal relations are talked about, which is the meta-model of Zečević et al.\ \cite{Zecevic2023CausalPL}, and there is no Markov or faithfulness link between them and the structure given in the prompt. Pearl's hierarchy tells us that L2 and L3 answers require structure; the Markov and faithfulness conditions tell us when statistics can reveal structure; Rosen's modeling relation, in Astorga and Letelier's reading, tells us why a statistical compression of text does not supply it. Without Rosen, the framework would still predict failures, but it would not explain why the failures should follow word plausibility, which is the prediction we test.
 
-% EDITOR: relation between Rosen's framework and Markov/faithfulness -> addressed in Sect. 3.3.
-% EDITOR: "Can your framework work without Rosen's?" -> addressed at the end of Sects. 3.1 and 3.3.
-
 \subsection{From theory to a testable prediction}
 \label{sec:predictions}
 
@@ -169,8 +157,6 @@ CLadder \cite{jin2023cladder} contains yes/no questions generated from a causal 
 
 The \emph{story} names the variables: textbook examples (\textcolor{cComm}{commonsensical}), an unrelated effect or treatment such as ``ear shape'' or ``plays card games'' (\textcolor{cAnti}{anti-commonsensical}), or invented words such as ``zory'' (\textcolor{cNons}{nonsensical}) \cite{jin2023cladder}.
 
-% EDITOR: what do "subtypes" and "graph topology" refer to -> defined in Sect. 4.1.
-
 \subsection{Sampling and matched pairs}
 \label{sec:sampling}
 
@@ -179,7 +165,7 @@ The commonsensical and anti-commonsensical files of CLadder v1 contain the same 
 \subsection{Models}
 \label{sec:models}
 
-We tested four smaller AI models: SmolLM2-1.7B-Instruct, Qwen2.5-1.5B-Instruct, Phi-3.5-mini-instruct (3.8B), and Qwen2.5-7B-Instruct. We ran SmolLM2 and Qwen2.5-1.5B using full precision (32-bit) because they fit on the GPU, which made their 'Yes' probabilities consistent. Phi-3.5 and Qwen2.5-7B were too large, so we used a special method (4-bit quantization and 16-bit computation) to load them. This means their 'Yes' probabilities might vary slightly depending on how items are grouped. All models answered the same items in each run, grouped in batches of 8 for the direct and question-only runs and 32 for the CausalCoT run. We recorded all results with details about each model's settings.
+We tested four light open-weight instruction-tuned models: SmolLM2-1.7B-Instruct, Qwen2.5-1.5B-Instruct, Phi-3.5-mini-instruct (3.8B), and Qwen2.5-7B-Instruct. SmolLM2 and Qwen2.5-1.5B ran in 32-bit precision, which makes their $P(\text{Yes})$ independent of batching. Phi-3.5 and Qwen2.5-7B did not fit on the available GPU at that precision and were loaded with 4-bit quantization and 16-bit computation, so their $P(\text{Yes})$ can vary slightly with the composition of a batch. All models answered the same items in each run, grouped in batches of 8 for the direct and question-only runs and 32 for the CausalCoT run. We recorded all results with details about each model's settings.
 
 \subsection{Three runs}
 \label{sec:runs}
@@ -192,11 +178,10 @@ where $\ell_t$ is the logit of token $t$ and $\mathcal{Y}$, $\mathcal{N}$ are th
 
 \begin{itemize}
   \item \emph{Direct.} The model receives the CLadder background, which states the causal graph, the given probabilities, the question, and ``Answer with Yes or No only.'' This run tests whether the answer follows the given structure, and whether it changes with the type of question. We ran it with 1,000 commonsensical, 1,000 anti-commonsensical, and 1,000 nonsensical items per model.
-  \\
   \item \emph{CausalCoT.} The model first writes out its reasoning following the six steps of Jin et al.\ \cite{jin2023cladder} (extract the graph, identify the query type, formalize it, gather the data, derive the estimand, compute it), and is then asked for the Yes/No answer. This run tests whether step-by-step reasoning helps small models use the structure. It was added after the direct run and uses a subset of 150 pairs and 150 nonsensical items per model.
-  \\
   \item \emph{Question-only.} The model receives only the question and ``Answer with Yes or No only.'', without the background or the probabilities. Its $P(\text{Yes})$ is then the model's \emph{prior} for the question as worded, which is what the variable names alone suggest. This run checks the assumption behind H1 and H1b: that anti-commonsensical names carry a prior against the stated relation. If they do not, the direct run cannot distinguish our account from its alternative. It was added after the other two runs and uses the 1,000 matched pairs.
 \end{itemize}
+
 \subsection{Analysis}
 \label{sec:analysis}
 
@@ -207,7 +192,7 @@ We report accuracy for each model and run, separately for the three types of que
 \end{itemize}
 Each null hypothesis ($H_0$) states that the change being compared, such as renaming a variable or adding the graph to the prompt, has no effect on the model's answers. Table~\ref{tab:summary} lists them together with the results.
 
-The CausalCoT run is exploratory, and we report it descriptively. We only compare its differences with the half-width of a 95\% interval for a difference between two accuracies near 0.5: an accuracy $p$ on $n$ items has standard error $\sqrt{p(1-p)/n} \leq \sqrt{0.25/n}$, the variances of two groups add, and the half-width is therefore at most $1.96\sqrt{2 \cdot 0.25/n}$. Table~\ref{tab:threshold} gives this threshold for the CausalCoT comparisons; smaller differences are within sampling variation.
+The CausalCoT run is exploratory, and we report it descriptively. We only compare its differences with the half-width of a 95\% interval for a difference between two accuracies near 0.5: an accuracy $p$ on $n$ items has standard error $\sqrt{p(1-p)/n} \leq \sqrt{0.25/n}$, the variances of two groups add, and the half-width is therefore at most $1.96\sqrt{2 \cdot 0.25/n}$. Table~\ref{tab:threshold} gives this threshold for the CausalCoT comparisons; smaller differences are within sampling variation. For the comparison of CausalCoT with the direct run, which uses the same items, the threshold is conservative, because it ignores the pairing.
 
 \begin{table}[!htbp]
 \centering
@@ -259,7 +244,7 @@ Table~\ref{tab:summary} summarizes, for each run, the comparisons we make, their
 \hline
 \rr Asked on its own, the anti-C.\ question receives the same probability of ``Yes'' as its commonsensical twin & \rr Paired t & \rr Prior gap $+0.09$ to $+0.23$; all $p < 0.001$ & \rr $H_0$ rejected for every model: the names carry a prior \\
 \rr With the graph and the probabilities, the two questions receive the same probability of ``Yes'' & \rr Paired t & \rr $-0.023$ to $+0.037$, in both directions; $p < 0.01$ for three models, $p = 0.51$ for Qwen2.5-7B & \rr Small residual differences, without a consistent direction \\
-\rr Adding the graph and the probabilities does not change the gap between the two names & \rr Paired t & \rr The gap shrinks by $0.09$ to $0.24$ (83--96\% of the prior gap); all $p < 0.001$ & \rr $H_0$ rejected for every model: the context overrides the prior \\
+\rr Adding the graph and the probabilities does not change the gap between the two names & \rr Paired t & \rr The absolute gap falls by 83--96\%; all $p < 0.001$ & \rr $H_0$ rejected for every model: the context overrides the prior \\
 \rr (Descriptive) Share of the in-context $P(\text{Yes})$ explained by the prior and by the correct answer & \rr Regression & \rr Smaller models: prior 9--17\%, answer ${\approx}0\%$ & \rr Smaller models follow the wording, not the structure \\
 \bottomrule
 \end{tabular}
@@ -268,7 +253,7 @@ Table~\ref{tab:summary} summarizes, for each run, the comparisons we make, their
 \subsection{Direct run: near-chance accuracy and no difference between question types}
 \label{sec:res-direct}
 
-All four models answer close to chance: accuracy is between 0.50 and 0.60 for every model and type of question (Table~\ref{tab:variants}, Fig.~\ref{fig:acc-variant}). Table~\ref{tab:differences} lists the differences.The type of question makes no difference. For every model, the gap between commonsensical and anti-commonsensical questions, and between commonsensical and nonsensical ones, is below 0.04 and not significant (all $p \geq 0.10$), so H1 is not supported. Nor is H1b: on relational items whose answer is ``Yes'', the mean $P(\text{Yes})$ differs by at most 0.05 between the two names (Table~\ref{tab:variants}, last column). The shift is significant for three models, but only Phi-3.5 shifts in the predicted direction; both Qwen models shift the opposite way.H2 is not supported either. Higher rungs are not harder: where the rungs differ, L2 or L3 is \emph{more} accurate than L1, the opposite of the prediction. The largest difference is for Qwen2.5-7B, whose accuracy rises from 0.52 at L1 to 0.64 at L2 ($p < 0.001$).
+All four models answer close to chance: accuracy is between 0.50 and 0.60 for every model and type of question (Table~\ref{tab:variants}, Fig.~\ref{fig:acc-variant}). Table~\ref{tab:differences} lists the differences. The type of question makes no difference. For every model, the gap between commonsensical and anti-commonsensical questions, and between commonsensical and nonsensical ones, is below 0.04 and not significant (all $p \geq 0.10$), so H1 is not supported. Nor is H1b: on relational items whose answer is ``Yes'', the mean $P(\text{Yes})$ differs by at most 0.05 between the two names (Table~\ref{tab:variants}, last column). The shift is significant for three models, but only Phi-3.5 shifts in the predicted direction; both Qwen models shift the opposite way. H2 is not supported either. Higher rungs are not harder: where the rungs differ, L2 or L3 is \emph{more} accurate than L1, the opposite of the prediction. The largest difference is for Qwen2.5-7B, whose accuracy rises from 0.52 at L1 to 0.64 at L2 ($p < 0.001$). Because each rung contains different query types, these differences partly reflect which query types receive a fixed answer, described next.
 
 The models are also strongly biased. SmolLM2 answers ``No'' to all but 0.1\% of the items, so its accuracy simply reflects the share of ``No'' answers in each group. Other models give a fixed answer to some query types: Phi-3.5 and Qwen2.5-7B answer ``No'' to every collider-bias question, whatever the graph and the numbers.
 
@@ -345,9 +330,9 @@ Model & Comm. & Nons. & Anti-C. & Comm. & Nons. & Anti-C. & Change \\
 \subsection{Question-only run: the names carry a prior that the context overrides}
 \label{sec:res-prior}
 
-The only large and consistent differences between types of question appear when the question is asked alone. Without the background and the probabilities, every model assigns much less probability to ``Yes'' on the anti-commonsensical question than on its commonsensical twin (Table~\ref{tab:prior}): the prior gap is between $0.09$ (SmolLM2) and $0.23$ (Qwen2.5-7B), with every interval far from zero, and the anti-commonsensical question receives the lower $P(\text{Yes})$ in 73--78\% of pairs. The names therefore carry the prior that H1 and H1b assume, and the models tested are not too small to hold it. When the same questions are asked with the graph and the probabilities, the gap shrinks by 83--96\% for every model ($p < 0.001$), to between $-0.023$ and $+0.037$. The residual gaps are small and go in both directions: significant for three models, not for Qwen2.5-7B. The given context largely overrides the names.
+The only large and consistent differences between types of question appear when the question is asked alone. Without the background and the probabilities, every model assigns much less probability to ``Yes'' on the anti-commonsensical question than on its commonsensical twin (Table~\ref{tab:prior}): the prior gap is between $0.09$ (SmolLM2) and $0.23$ (Qwen2.5-7B), with every interval far from zero, and the anti-commonsensical question receives the lower $P(\text{Yes})$ in 73--78\% of pairs. The names therefore carry the prior that H1 and H1b assume, and the models tested are not too small to hold it. When the same questions are asked with the graph and the probabilities, the gap shrinks significantly for every model ($p < 0.001$), to between $-0.023$ and $+0.037$; its absolute size falls by 83--96\%. The residual gaps are small and go in both directions: significant for three models, not for Qwen2.5-7B. The given context largely overrides the names.
 
-Overriding the names is not the same as using the structure. For each model, we regressed the in-context $\operatorname{logit} P(\text{Yes})$ on the question-only $\operatorname{logit} P(\text{Yes})$ and on the correct answer. For SmolLM2 and Qwen2.5-1.5B, the correct answer explains none of the in-context probability, while the question-only prior still explains 9--17\% of its variance; for Phi-3.5 and Qwen2.5-7B, both terms contribute, and only Qwen2.5-7B depends more on the correct answer than on the prior. The small models remove the effect of the names without replacing it with the given structure: their answers follow how the question is worded.
+Overriding the names is not the same as using the structure. For each model, we regressed the in-context $\operatorname{logit} P(\text{Yes})$ on the question-only $\operatorname{logit} P(\text{Yes})$ and on the correct answer. We compare the two terms by the share of variance each explains beyond the other (unique $R^2$), because their coefficients are on different scales. For SmolLM2 and Qwen2.5-1.5B, the correct answer explains none of the in-context probability (unique $R^2 \leq 0.002$), while the question-only prior still explains 17\% and 9\% of its variance. For Phi-3.5 and Qwen2.5-7B both terms contribute (prior 0.087 and 0.027; answer 0.043 and 0.065), and only Qwen2.5-7B depends more on the correct answer than on the prior. The question-only prior reflects the whole wording of the question, including its query-type template, not only the names. The small models remove the effect of the names without replacing it with the given structure: their answers follow how the question is worded.
 
 \begin{table}[!htbp]
 \centering
@@ -367,7 +352,7 @@ Model & $\bar P(\text{Yes})$ alone & Prior gap [95\% CI] & Gap in context [95\% 
 \section{Discussion and Limitations}
 \label{sec:discussion}
 
-\paragraph{The prediction is not supported, although the prior is there.} By the criterion stated in Sect.~\ref{sec:predictions}, the absence of an accuracy gap and of a consistent shift in $P(\text{Yes})$ between commonsensical and anti-commonsensical items counts against the word-plausibility account for these models, with or without step-by-step reasoning. This agrees with Jin et al., who found only a 1.8-point gap for GPT-4 \cite{jin2023cladder}. The question-only run rules out the most obvious escape: the models do hold the prior that the account relies on, and hold it strongly. Asked alone, the anti-commonsensical question receives 0.09--0.23 less probability of ``Yes''. With the graph and the numbers in the prompt, this gap shrinks by 83--96\%, to at most 0.04. Plausibility is present, but at this scale the given context overrides it.
+\paragraph{The prediction is not supported, although the prior is there.} By the criterion stated in Sect.~\ref{sec:predictions}, the absence of an accuracy gap and of a consistent shift in $P(\text{Yes})$ between commonsensical and anti-commonsensical items counts against the word-plausibility account for these models, with or without step-by-step reasoning. This agrees with Jin et al., who found only a 1.8-point gap for GPT-4 \cite{jin2023cladder}. The question-only run rules out the most obvious escape: the models do hold the prior that the account relies on, and hold it strongly. Asked alone, the anti-commonsensical question receives 0.09--0.23 less probability of ``Yes''. With the graph and the numbers in the prompt, its absolute size falls by 83--96\%, to at most 0.04. Plausibility is present, but at this scale the given context overrides it.
 
 \paragraph{What limits these models.} The context overrides the names without being used as structure. Accuracy is near chance, several query types receive the same answer whatever the numbers, the reasoning traces often invent data, and for the two smallest models the in-context answer follows the question-only prior and not the correct answer. The failure is one of grounding, of using the graph and information given in the prompt, rather than of plausibility overriding structure. This is compatible with the reactive-systems frame of Sect.~\ref{sec:rosen}, in which the answer is a response to the form of the input rather than the output of a model of the system described, but it is not the specific mechanism we predicted. Reasoning helped only Qwen2.5-7B, which invents data least and whose answers depend more on the correct answer than on the prior: reasoning helps a model that uses the given information, not one that replaces it. Butkus and Kriegeskorte's result \cite{butkus2025causal}, where next-token prediction on data generated by causal models yields causal inference, is consistent with the architectural claim: what these models lack is a training signal coupled to the system they are asked about, not a capacity for prediction.
 
@@ -377,8 +362,6 @@ Model & $\bar P(\text{Yes})$ alone & Prior gap [95\% CI] & Gap in context [95\% 
 The question-only prompt is unusual for the models, which mostly answer ``No'' to it (3--16\% ``Yes''), so the prior is measured by the probability of ``Yes'' rather than by the answers. The invented-data rate is a text heuristic. Finally, thresholding $P(\text{Yes})$ at 0.5 mixes answer bias into accuracy, as SmolLM2 shows.
 
 \paragraph{Practical challenges.} A first run of SmolLM2 on all 10,560 items of the CLadder v1 easy file, generating and parsing answers, took 31 hours and lost answers to over-length and unreadable responses; it was near chance (0.47) with 64\% ``yes'' answers. Reading answer probabilities from a single forward pass removed both problems. Half-precision arithmetic made the probabilities depend on batching. We removed this with 32-bit computation for the two smallest models, but the two larger models only fit in 4-bit quantization with 16-bit computation. For the CausalCoT condition, reasoning traces of 512 tokens were often too short, and regenerating only the truncated traces at a higher limit kept the cost manageable.
-
-% EDITOR: discuss limitations and challenges more thoroughly -> Sect. 6 (Limitations; Practical challenges).
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -390,9 +373,4 @@ LLMs are increasingly used as a stand-in for domain experts in causal discovery.
 %
 \bibliographystyle{splncs04}
 \bibliography{references}
-% Detailed analyses of the direct and CausalCoT runs: set \includeappendixtrue to add them.
-\ifincludeappendix
-\appendix
-\input{appendix}
-\fi
 \end{document}
