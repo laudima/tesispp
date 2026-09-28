@@ -165,7 +165,7 @@ The commonsensical and anti-commonsensical files of CLadder v1 contain the same 
 \subsection{Models}
 \label{sec:models}
 
-We tested four light open-weight instruction-tuned models: SmolLM2-1.7B-Instruct, Qwen2.5-1.5B-Instruct, Phi-3.5-mini-instruct (3.8B), and Qwen2.5-7B-Instruct. SmolLM2 and Qwen2.5-1.5B ran in 32-bit precision, which makes their $P(\text{Yes})$ independent of batching. Phi-3.5 and Qwen2.5-7B did not fit on the available GPU at that precision and were loaded with 4-bit quantization and 16-bit computation, so their $P(\text{Yes})$ can vary slightly with the composition of a batch. All models answered the same items in each run, grouped in batches of 8 for the direct and question-only runs and 32 for the CausalCoT run. We recorded all results with details about each model's settings.
+We tested four light open-weight instruction-tuned models: SmolLM2-1.7B-Instruct, Qwen2.5-1.5B-Instruct, Phi-3.5-mini-instruct (3.8B), and Qwen2.5-7B-Instruct. SmolLM2 and Qwen2.5-1.5B ran in 32-bit precision for the $P(\text{Yes})$ probabilities, which makes their $P(\text{Yes})$ independent of batching.  We recorded all results with details about each model's settings.
 
 \subsection{Three runs}
 \label{sec:runs}
