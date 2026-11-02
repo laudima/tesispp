@@ -1,0 +1,99 @@
+\begin{tikzpicture}[
+    >=Stealth,
+    font=\sffamily,
+    node distance=1.8cm and 2.5cm,
+    % Estilo de las cajas de entidades
+    entity/.style={
+        rectangle,
+        rounded corners=4pt,
+        draw=cyan!70!black,
+        fill=cyan!20!black,
+        text=white,
+        thick,
+        align=center,
+        inner sep=10pt,
+        minimum width=3.8cm,
+        minimum height=1.4cm
+    },
+    % Estilo del régimen de restricciones
+    regime/.style={
+        rectangle,
+        rounded corners=6pt,
+        draw=orange!80!black,
+        fill=orange!20!black,
+        text=white,
+        thick,
+        align=center,
+        inner sep=12pt,
+        minimum width=9.5cm
+    },
+    % Estilos de líneas
+    downward/.style={->, very thick, color=orange!80!black},
+    upward/.style={->, thick, dashed, color=teal!70!black},
+    mutual/.style={<->, very thick, color=cyan!70!black}
+]
+
+    % Régimen de restricciones (nivel superior)
+    \node[regime] (CR) {
+        \textbf{Régimen de Restricciones (\textit{Constraint-Regimes})} \\
+        \small (Scripts culturales, lenguaje, instituciones, infraestructura material)
+    };
+
+    % Entidades / Agentes (nivel inferior)
+    \node[entity, below left=2.2cm and 0.2cm of CR] (EA) {
+        \textbf{Entidad / Agente A} \\
+        \footnotesize Modelo generativo (AIF)
+    };
+    
+    \node[entity, below right=2.2cm and 0.2cm of CR] (EB) {
+        \textbf{Entidad / Agente B} \\
+        \footnotesize Modelo generativo (AIF)
+    };
+
+    % 1. Interacción horizontal (multidireccional entre agentes)
+    \draw[mutual] (EA) -- (EB) 
+        node[midway, below=3pt, align=center, font=\scriptsize, text=white] {
+            Intercambio bidireccional /\\
+            acoplamiento mutuo
+        };
+
+    % 2. Influencia vertical descendente (Top-down: constriñe y modula)
+    \draw[downward] ([xshift=-1.8cm]CR.south) -- (EA.north)
+        node[midway, left=2pt, align=right, font=\scriptsize, text=orange!80!black] {
+            Ejerce límites \\ y modula el régimen (\textit{Poder})
+        };
+        
+    \draw[downward] ([xshift=1.8cm]CR.south) -- (EB.north)
+        node[midway, right=2pt, align=left, font=\scriptsize, text=orange!80!black] {
+            Refuerzan o \\ alteran los scripts (\textit{Poder})
+        };
+
+    % 3. Influencia vertical ascendente / retroactiva (Bottom-up: sedimentación o cambio)
+    \draw[upward] (EA.north west) to[out=110, in=205] ([xshift=-3.5cm]CR.south)
+        ;
+    \node[anchor=south east, xshift=-0.25cm, yshift=0.55cm,
+        align=right, font=\scriptsize, text=teal!70!black] at (EA.north west) {
+        (top-down)
+    };
+
+    \draw[upward] (EB.north east) to[out=70, in=335] ([xshift=3.5cm]CR.south)
+        ;
+    \node[anchor=south west, xshift=0.25cm, yshift=0.55cm,
+        align=left, font=\scriptsize, text=teal!70!black] at (EB.north east) {
+        (Retroalimentación \\ bottom-up)
+    };
+
+    % Fondo que enmarca la totalidad como un sistema interactivo
+    \begin{scope}[on background layer]
+        \node[
+            draw=gray!30,
+            dashed,
+            rounded corners=8pt,
+            fill=black,
+            fit=(CR) (EA) (EB),
+            inner sep=14pt,
+            label={[anchor=south east, font=\itshape\tiny, text=gray!70]south east:Sistema dinámico no lineal}
+        ] {};
+    \end{scope}
+
+\end{tikzpicture}

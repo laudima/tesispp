@@ -38,3 +38,4 @@ tesis-papers/rosen2012anticipatory.pdf
 *.symbols-glo
 *.symbols-gls
 *.bbl
+.DS_Store
