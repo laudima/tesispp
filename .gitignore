@@ -39,3 +39,4 @@ tesis-papers/rosen2012anticipatory.pdf
 *.symbols-gls
 *.bbl
 .DS_Store
+toeffl-recursos-estudio/*

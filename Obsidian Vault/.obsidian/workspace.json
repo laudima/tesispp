@@ -1,0 +1,343 @@
+{
+  "main": {
+    "id": "f939d560365637c9",
+    "type": "split",
+    "children": [
+      {
+        "id": "93caedc80f814ae1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f369e3f4dc5a13c6",
+            "type": "leaf",
+            "pinned": true,
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Pendientes.md",
+                "mode": "source",
+                "source": false
+              },
+              "pinned": true,
+              "icon": "lucide-file",
+              "title": "Pendientes"
+            }
+          },
+          {
+            "id": "5e72344e204bf6ad",
+            "type": "leaf",
+            "pinned": true,
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Reuniones Teams.md",
+                "mode": "preview",
+                "source": false
+              },
+              "pinned": true,
+              "icon": "lucide-file",
+              "title": "Reuniones Teams"
+            }
+          },
+          {
+            "id": "be8767b798c8288d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Ajustes que faltan.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Ajustes que faltan"
+            }
+          },
+          {
+            "id": "7b705e0ca45a07bd",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Posgrado.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Posgrado"
+            }
+          },
+          {
+            "id": "45e1ae9c77454428",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Radiografía.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Radiografía"
+            }
+          },
+          {
+            "id": "7930f5fb7843c760",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Sin título.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Sin título"
+            }
+          },
+          {
+            "id": "be578b1038554045",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Changes Journal.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Changes Journal"
+            }
+          },
+          {
+            "id": "f7d29689dd1c764e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Pendientes.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Pendientes"
+            }
+          }
+        ],
+        "currentTab": 7
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "b0557609dadae7b7",
+    "type": "split",
+    "children": [
+      {
+        "id": "e0604156c6c01f41",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f5f0372a6300469b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Explorador de archivos"
+            }
+          },
+          {
+            "id": "7d49ad9c1b3c4663",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "acción ",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Buscar"
+            }
+          },
+          {
+            "id": "8f4bfa41a943991c",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Marcadores"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 411.00390625
+  },
+  "right": {
+    "id": "fd1a0838a58e5df9",
+    "type": "split",
+    "children": [
+      {
+        "id": "740788a98780c94e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4990099ac6b965fa",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Opacidad epistemica.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Enlaces entrantes"
+            }
+          },
+          {
+            "id": "5ff2d524ab7918b1",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Opacidad epistemica.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Enlaces salientes"
+            }
+          },
+          {
+            "id": "944c328470e49d76",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Etiquetas"
+            }
+          },
+          {
+            "id": "28b0ccb7980deed6",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Todas las propiedades"
+            }
+          },
+          {
+            "id": "5944625829555942",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Opacidad epistemica.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Esquema"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Abrir selector rápido": false,
+      "graph:Abrir vista gráfica": false,
+      "canvas:Crear nuevo lienzo": false,
+      "daily-notes:Abrir la nota de hoy": false,
+      "templates:Insertar plantilla": false,
+      "command-palette:Abrir paleta de comandos": false,
+      "bases:Crear nueva base": false
+    }
+  },
+  "active": "f5f0372a6300469b",
+  "lastOpenFiles": [
+    "Philcomp/Guiones Videos.md",
+    "Lo que falta.md",
+    "Pendientes.md",
+    "AI Engineer.md",
+    "Posgrado.md",
+    "Chambas/Python data structures.md",
+    "Elektra/Radiografía.md",
+    "Reuniones Teams.md",
+    "Elektra/Sesión con diego Ajustes.md",
+    "Elektra/Sistema de recomendación Mike.md",
+    "Sin título.md",
+    "Elektra/Vistas.md",
+    "Philcomp/Solar Punk.md",
+    "Philcomp/Post Control Scripts-Societies.md",
+    "RAI/Plataforma grupo neoma..md",
+    "Elektra/Margen.md",
+    "Philcomp.md",
+    "Miriam.md",
+    "Elektra/Lo que cambio.md",
+    "Diario/Gotas de agua.md",
+    "Elektra/Correcciones viernes.md",
+    "Elektra/Ajustes que faltan.md",
+    "Changes Journal.md",
+    "imagenes/Pasted image 20261109100547.png",
+    "imagenes/Pasted image 20261110150606.png",
+    "imagenes/Pasted image 20261110150456.png",
+    "imagenes/Pasted image 20261110150338.png",
+    "imagenes/Pasted image 20261110150243.png",
+    "imagenes/Pasted image 20261106135445.png",
+    "imagenes/Pasted image 20261106135240.png",
+    "imagenes/Pasted image 20260820121720.png",
+    "Philcomp/La imposibilidad de comprimir la realidad - una crítica computacional a la promesa tecnocientífica.md",
+    "Elektra/Cambios.md",
+    "Elektra/Reuniones.md",
+    "imagenes/Pasted image 20261106134751.png",
+    "imagenes/Pasted image 20261106134410.png",
+    "Sin título.base",
+    "Diario",
+    "RAI",
+    "Academia",
+    "Philcomp",
+    "Chambas",
+    "Elektra/ciclo_de_vida.pptx",
+    "Elektra/ciclo_de_vida_v2.pptx",
+    "Elektra/radiografia_inventario.pptx",
+    "ciclo_de_vida.pptx"
+  ]
+}
