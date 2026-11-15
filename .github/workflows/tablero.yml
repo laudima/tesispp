@@ -1,0 +1,31 @@
+name: Tablero de pendientes
+
+# Regenera el issue "📌 Tablero de pendientes" con todos los issues abiertos
+# ordenados por fecha límite y prioridad. Ver planes/README.md.
+
+on:
+  schedule:
+    - cron: "17 12 * * *" # 06:17 en Ciudad de México (UTC-6)
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled, deleted]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: tablero
+  cancel-in-progress: true
+
+jobs:
+  tablero:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+      - name: Actualizar tablero
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/tablero.py
