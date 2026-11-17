@@ -1,65 +1,89 @@
 \documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+\usepackage[spanish,english]{babel}
+\usepackage{csquotes}
+\usepackage{caption}
+\usepackage[style=apa,backend=biber]{biblatex}
+\addbibresource{references.bib}
 
-\title{Openess to decentralization - Extended abstract}
+\title{Openess to decentralization }
 \author{Laura Itzel Rodríguez Dimayuga}
-\date{October 2026}
+\date{November 2026}
 
 \begin{document}
 
 \maketitle
 
-\section{Key Points}
+\section{Introduction}
+Many Large Language Models (LLMs) are claimed to be open, but they are not. The openness of LLMs is often limited to the ability to access the model through the pretrain model, but the underlying arquitecture and its training data are not open, the are called instead \textit{open weight models}. Currently almost all local LLMs are just open weight models, which make it hard trace the origin of the model, its training data, and its limitations. 
+\\ \\
+This lack of transparency can lead to issues of accountability, bias, and misuse. It is necesary for the scientific community to be able to use, study, modify and audit the systems that mediate their knowledge, decisions and relationships. When we talk about democratazing technology, we are talking about the ability to have access to the means of production, and in this case, the means of production are the LLMs, not just use them. That is distribution of power, not redistribution of power, we need owenership of the means of cognitive production. 
+
+\section{Problem}
+
+\textcite{sapkota2025comprehensive} examine more than a hundred recent models and find that many of those advertised as open source do not report their training data or code, a practice that the literature calls \textit{open-washing}. OLMo \cite{groeneveld-etal-2024-olmo} and Pythia \cite{biderman2023pythia} show that full openness is feasible, because they publish data, training code, and intermediate checkpoints.
+
+
+
+\section{Corpus}
+
+\subsection{Conceptual Distinction}
+
+Establish the definition of open weight, separete from full openness and propose four capabilities as criteria: use, study, modify, and audit. Weights guarantee the first and only partially the other three.
+
+\subsection{Regulatory Framework}
+
+Althoug \textcite{EU2024_1689} exempts certain transparency obligations for general-purpose models with free licenses whose weights, architecture, and usage information are public, it acknowledges that this release does not reveal substantial information about the training data. Therefore, it maintains the obligation to publish a summary of the content used and a copyright policy. 
+\\ \\
+\textcite{qiu2026modeling} build on this ambiguity and model how the openness threshold set by the regulator alters developers' publication decisions.
+Show that the European Regulation defines openness by the published artifacts and not by the capabilities it enables, and that it recognizes this limitation by retaining obligations on data. 
+\\ \\
+\textcite{manchanda2026open} argue, from the capabilities approach, that open development enhances transparency, reproducibility, community participation, and auditability. They propose that an AI is democratic when it redistributes power, both in its development and in its action.
+
+\subsection{Philosophical and political axes}
 \begin{itemize}
+\item Use the Marxist theory of dependency to analyze the problem from a Latin American perspective \textcite{reyes2025pattern}.
+\item If social interaction is mediated by LLMs, it cannot be deliberated about what cannot be inspected. \textcite{manchanda2026open} treat LLMs as infrastructure that mediates access to knowledge, and \textcite{machado2025toward} associate open models with independent scrutiny and bias mitigation.
+\item Previous work describes power as the ability to modulate attention through shared scripts. LLMs infer attributes of their users and condition their behavior on those inferences, including refusals to respond, and this internal state can be read and modified. This case nuances the thesis: audit is already possible with access to weights. What weights do not provide is the provenance of the data or the possibility of remaking the model.
+\item Research shows that the personality exhibited by an LLM can be measured and shaped. \textcite{maeda2024human} analyze how anthropomorphic design induces trust and parasocial bonds. Whoever controls the model also controls the tone of the bond, and users of a closed system cannot verify for what purposes it is adjusted.
+\item \textcite{habermas2022neuer} argue that democracy lives in public debate, but what happens when the public sphere has conditions that prevent interaction with users? The public sphere is a space of communication where citizens can debate and deliberate on matters of common interest. The emergence of bots and their interaction with users can affect the quality of debate and deliberation. Bots can be used to spread false or biased information, which can affect public opinion and decision-making, increasing hate speech, polarization, and disinformation.
+\end{itemize}
+\subsection{Objections} 
 
-\item The real definition of the open arquitecture. 
-
-Many Large Language Models (LLMs) are claimed to be open, but they are not. The openness of LLMs is often limited to the ability to access the model through the pretrain model, but the underlying arquitecture and its training data are not open, the are called instead 
-\textit{open weight models}. Currently almost all local LLMs are just open weight models, which make it hard trace the origin of the model, its training data, and its limitations. This lack of transparency can lead to issues of accountability, bias, and misuse.
-
-\item Local necessity of LLMs.
-
-There are several reasons why local LLMs are increasingly being deploy, including the need for privacy, security, and control over the model's behavior. Local LLMs can be run on personal devices or on-premises servers, which allows users to have more control over their data and the model's behavior.  
-
-\item Collective knowledge must be audited and cloness replicates hemogony. 
-
-Open LLMs can be treated as collective research artifacts rather than proprietary products. 
-This supports values of transparency, reproducibility, public benefit, and the right of communities to inspect and 
-adapt systems that affect them.
-
-\item Prepare ourselves for the future of system recomendations,personification that  creates a sense of connection and emotional attachment between the user and the model, leading to parasentimental relationships.
-
-Current LLMs use personal traits to adjust the response based on the user \cite{serapio2023personality}. This can be seen as a form of manipulation and control, as it can influence the user's behavior and decision-making. By decentralizing LLMs, users can have more control over their interactions with the model and can avoid being manipulated by the model's creators.
-\medskip
-\noindent\rule{\linewidth}{0.4pt}
-\medskip
-\item Como se tranforman las dinamicas socilaes, la separación, la individuación en las relaciones con llms. 
-
-Si Jürgen Habermas planteaba en \textit{Un nuevo cambio estructural de la esfera pública y la política deliberativa} - la democracia vive en el debate público pero que pasa cuando la pasa pública tienen condiciones que impiden la interacción con los usuarios-  la esfera pública es un espacio de comunicación donde los ciudadanos pueden debatir y deliberar sobre asuntos de interés común, la aparición de los Bots y su interacción con los usuarios puede afectar la calidad del debate y la deliberación. Los Bots pueden ser utilizados para difundir información falsa o sesgada, lo que puede afectar la opinión pública y la toma de decisiones. Aumentar los discrusos de odio, la polarización y la desinformación.
+\begin{itemize}
+\item Opening data and processes increases the risk of misuse.
+\item Fully open models still perform worse
+\item Opening the data does not decentralize anything if computing remains concentrated.
+\item The complexity of managing and maintaining open-source projects can be a significant burden.
 \end{itemize}
 
-\section{Platica}
-\subsection{Tesis Central}
-La apertura de los LLMs no consiste únicamente en descargar pesos; consiste en que las comunidades puedan usar, 
-estudiar, modificar y auditar los sistemas que median su conocimiento, sus decisiones y sus relaciones.”
 
-\subsection{Resumen de la charla}
-Nombre de la platica: Apertura a la descentralización.
-\vspace{1cm} 
 
-Muchos grandes modelos de lenguaje (LLMs) se presentan como abiertos, pero en realidad no lo son.
-La apertura de los LLMs a menudo se limita a la capacidad de acceder al modelo sin la receta ni sus datos
-de entrenamiento; por ello se les denomina \textit{modelos de peso abierto}. 
-Actualmente, la mayoría de los LLMs locales son solo modelos de peso abierto, aunque existen algunos, como OLMo o Pythia, que son completamente abiertos. Esto dificulta rastrear el origen del modelo, sus datos de entrenamiento y sus limitaciones, ocasionando una falta de transparencia que puede generar problemas de responsabilidad, sesgo y uso indebido.
+\begin{table}[t]
+\centering
+\caption{Comparison of LLMs from a Marxist perspective. The table presents four key concepts from Marxist theory and their corresponding implications for LLMs, along with questions that arise from these implications.}
+\label{tab:llm_comparison}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|p{0.18\textwidth}|p{0.36\textwidth}|p{0.36\textwidth}|}
+\hline
+Term & LLMs & Questions \\
+\hline
+Means of production & Data, GPUs, code, models, cloud infrastructure & Who owns the resources to train and deploy AI? \\
+\hline
+Surplus value / extraction & Personal data, annotation labor, attention and engagement, cognitive capital & What value is extracted from interactions with the models? \\
+\hline
+Private  property & Weights under restrictive licenses, closed datasets, APIs & Is “openness” real, or is it a form of marketing? \\
+\hline
+Alienation & Dependence on opaque systems for thinking, writing, or making decisions & Does the user understand and control the tool they use? \\
+\hline
+\end{tabular}
+\end{table}
 
-En esta charla presentaremos algunas legislaciones y regulaciones que buscan la apertura de los LLMs, y argumentaré que la verdadera apertura de los LLMs implica no solo el acceso a los pesos, sino también a los datos de entrenamiento y a la capacidad de modificar y auditar el modelo. La discusión sobre LLMs “abiertos” no es solo técnica, sino una disputa sobre quién controla los medios de producción cognitivos, quién define la verdad y quién conserva la capacidad de deliberación y autonomía. La charla está organizada en cuatro ejes de discusión: 1) infraestructura (Marx), 2) control (Foucault), 3) conocimiento (Habermas, esfera pública) y 4) relaciones (Serapio: parasentimentalidad).
 
-\subsection{Sobre la autora}
 
-Laura Itzel Rodríguez Dimayuga es investigadora interna del Grupo de Investigación de Filosofía de Computación. Actualmente, se 
-encuentra desarrollando su tesis de licenciatura en Ciencias de la Computación en la Universidad Nacional Autónoma de México (UNAM). 
-Su investigación se centra en el razonamiento causal aplicado a los modelos de lenguaje.
+
 
 %bibliography
-\bibliographystyle{plain}
-\bibliography{references}
+\printbibliography
 \end{document}
