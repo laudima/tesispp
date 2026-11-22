@@ -13,7 +13,7 @@ Leer el material que tengo en la carpeta de toffel
 
 ## Philcomp
 
-Extended Abstract - 16 de Noviembre 
+Position paper enero 2027, Extended Abstract - 16 de Noviembre 
 Post del enactivismo [./Philcomp/Handout_Not thinking about the same thing. Enactivism, pragmatism and intentionality.pdf]
 Post de los resumenes de las charlas del 3er simposio de filosofía de la computación [Excel](https://docs.google.com/spreadsheets/d/1zZt2mTkLMaT73PoWBsb01D6Z_bJUsUwjUCJaNZQo43w/edit?gid=1958973489#gid=1958973489)
 Aspire Leader program: [Higher Education & Research](https://engage.aspireleaders.org/pathways)

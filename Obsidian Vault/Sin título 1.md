@@ -1,0 +1,3 @@
+Estamos por concluir las actividades de la Semana de la Filosofía 2026 con actividades abiertas en la Librería La Colmena, en Tlatelolco. Organizada por el Grupo de Investigación en Filosofía de la Computación (UNAM), por invitación del Centro de Investigación en Ciencia Anticipatoria y Relacional (CICAR) y de la propia librería. Agradecemos a todos nuestros asistentes y a los ponentes que nos ayudaron a llevar acabo esta serie de charlas. 
+
+Los invitamos la nota  sobre la ponencia de Gabriela Sued y Astrid Dzul Hori publicada por La Jornada: https://tinyurl.com/bdd7hbdt
